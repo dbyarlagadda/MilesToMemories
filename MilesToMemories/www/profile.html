@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#faf8f5">
+    <title>Profile | MilesToMemories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sky-blue: #a8ccd7;
+            --sky-blue-light: #d4e8ed;
+            --sandy-beige: #e8dcc4;
+            --sandy-beige-light: #f5f0e6;
+            --forest-green: #4a6741;
+            --forest-green-light: #7a9a6d;
+            --warm-neutral: #c9b99a;
+            --warm-cream: #faf8f5;
+            --soft-gray: #6b6b6b;
+            --dark-text: #2d2d2d;
+            --white: #ffffff;
+            --error-red: #d64545;
+            --instagram: #E4405F;
+            --pinterest: #BD081C;
+            --youtube: #FF0000;
+
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--warm-cream);
+            color: var(--dark-text);
+            padding-bottom: calc(70px + var(--safe-bottom));
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: calc(60px + var(--safe-top));
+            padding: var(--safe-top) 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-back {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--sandy-beige-light);
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            color: var(--dark-text);
+        }
+
+        .nav-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            padding: calc(80px + var(--safe-top)) 20px 30px;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--sky-blue-light), var(--warm-cream));
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--white);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--forest-green);
+            color: var(--white);
+            border: 3px solid var(--white);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-name {
+            font-family: var(--font-serif);
+            font-size: 1.75rem;
+            color: var(--dark-text);
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 0.9rem;
+            color: var(--soft-gray);
+            margin-bottom: 16px;
+        }
+
+        .profile-bio {
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            max-width: 300px;
+            margin: 0 auto 20px;
+            line-height: 1.5;
+        }
+
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--forest-green);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--soft-gray);
+        }
+
+        /* Sections */
+        .section {
+            padding: 24px 20px;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--soft-gray);
+            margin-bottom: 16px;
+        }
+
+        /* Profile Form */
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--soft-gray);
+        }
+
+        .form-input {
+            padding: 14px 16px;
+            border: 1px solid var(--sandy-beige);
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--forest-green);
+            box-shadow: 0 0 0 3px rgba(74, 103, 65, 0.1);
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .save-btn {
+            padding: 16px;
+            background: var(--forest-green);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .save-btn:hover {
+            background: var(--dark-text);
+        }
+
+        /* Social Connections */
+        .social-connections {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--sandy-beige);
+        }
+
+        .social-item-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .social-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .social-icon.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+        }
+
+        .social-icon.pinterest {
+            background: var(--pinterest);
+            color: white;
+        }
+
+        .social-icon.youtube {
+            background: var(--youtube);
+            color: white;
+        }
+
+        .social-info h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .social-info p {
+            font-size: 0.85rem;
+            color: var(--soft-gray);
+        }
+
+        .social-info p.connected {
+            color: var(--forest-green);
+        }
+
+        .social-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .social-btn.connect {
+            background: var(--forest-green);
+            color: var(--white);
+            border: none;
+        }
+
+        .social-btn.connected {
+            background: var(--sandy-beige-light);
+            color: var(--soft-gray);
+            border: 1px solid var(--sandy-beige);
+        }
+
+        .social-btn.view {
+            background: none;
+            color: var(--forest-green);
+            border: 1px solid var(--forest-green);
+        }
+
+        .social-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .social-btn.edit {
+            background: none;
+            color: var(--soft-gray);
+            border: 1px solid var(--sandy-beige);
+            padding: 10px 14px;
+        }
+
+        .social-btn.edit:hover {
+            border-color: var(--forest-green);
+            color: var(--forest-green);
+        }
+
+        .social-btn.disconnect {
+            background: none;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            padding: 10px 14px;
+        }
+
+        .social-btn.disconnect:hover {
+            background: var(--error-red);
+            color: white;
+        }
+
+        /* Social Edit Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .social-edit-modal {
+            background: var(--white);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .social-edit-modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--sandy-beige-light);
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            margin: 0;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--sandy-beige-light);
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .social-edit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .social-edit-item .form-input {
+            flex: 1;
+        }
+
+        .social-edit-hint {
+            font-size: 0.8rem;
+            color: var(--soft-gray);
+            margin-top: 4px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--sandy-beige-light);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: var(--sandy-beige-light);
+            color: var(--dark-text);
+            border: none;
+        }
+
+        .modal-btn.save {
+            background: var(--forest-green);
+            color: var(--white);
+            border: none;
+        }
+
+        .modal-btn.save:hover {
+            background: var(--dark-text);
+        }
+
+        /* Settings */
+        .settings-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--sandy-beige-light);
+            cursor: pointer;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .settings-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--sandy-beige-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .settings-label {
+            font-size: 1rem;
+            color: var(--dark-text);
+        }
+
+        .settings-arrow {
+            color: var(--soft-gray);
+            font-size: 1.25rem;
+        }
+
+        .signout-btn {
+            width: 100%;
+            padding: 16px;
+            background: none;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+
+        .signout-btn:hover {
+            background: var(--error-red);
+            color: var(--white);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: calc(70px + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            background: var(--white);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            color: var(--soft-gray);
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--forest-green);
+        }
+
+        .bottom-nav-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-text);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--forest-green);
+        }
+
+        /* Desktop */
+        @media (min-width: 768px) {
+            body {
+                padding-bottom: 0;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            .profile-header {
+                padding-top: 100px;
+            }
+
+            .profile-avatar-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .profile-avatar {
+                width: 150px;
+                height: 150px;
+            }
+
+            .section {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .profile-stats {
+                gap: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <button class="nav-back" onclick="window.location.href='index.html'">&#8592;</button>
+        <span class="nav-title">Profile</span>
+        <div class="nav-action"></div>
+    </nav>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar-container">
+            <img id="profileAvatar" class="profile-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Profile">
+            <button class="profile-avatar-edit" onclick="document.getElementById('avatarInput').click()">&#128247;</button>
+            <input type="file" id="avatarInput" accept="image/*" hidden onchange="changeAvatar(this)">
+        </div>
+        <h1 class="profile-name" id="profileName">Travel Explorer</h1>
+        <p class="profile-email" id="profileEmail">demo@milestomemories.com</p>
+        <p class="profile-bio" id="profileBio">Wanderer | Photographer | Storyteller</p>
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="tripCount">12</div>
+                <div class="stat-label">Trips</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="countryCount">8</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="photoCount">156</div>
+                <div class="stat-label">Photos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Section -->
+    <div class="section">
+        <h2 class="section-title">Edit Profile</h2>
+        <form class="profile-form" id="profileForm" onsubmit="saveProfile(event)">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="editName" placeholder="Your name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea class="form-input" id="editBio" placeholder="Tell us about yourself..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-input" id="editLocation" placeholder="Where are you based?">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Website</label>
+                <input type="url" class="form-input" id="editWebsite" placeholder="https://yourwebsite.com">
+            </div>
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Social Connections -->
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 class="section-title" style="margin-bottom: 0;">Connected Accounts</h2>
+            <button class="social-btn edit" onclick="openSocialEditModal()">Edit All</button>
+        </div>
+        <div class="social-connections">
+            <div class="social-item" id="instagramItem">
+                <div class="social-item-left">
+                    <div class="social-icon instagram">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <h4>Instagram</h4>
+                        <p id="instagramStatus">Not connected</p>
+                    </div>
+                </div>
+                <div class="social-btn-group" id="instagramBtnGroup">
+                    <button class="social-btn connect" id="instagramBtn" onclick="connectInstagram()">Connect</button>
+                </div>
+            </div>
+
+            <div class="social-item" id="pinterestItem">
+                <div class="social-item-left">
+                    <div class="social-icon pinterest">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <h4>Pinterest</h4>
+                        <p id="pinterestStatus">Not connected</p>
+                    </div>
+                </div>
+                <div class="social-btn-group" id="pinterestBtnGroup">
+                    <button class="social-btn connect" id="pinterestBtn" onclick="connectPinterest()">Connect</button>
+                </div>
+            </div>
+
+            <div class="social-item" id="youtubeItem">
+                <div class="social-item-left">
+                    <div class="social-icon youtube">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                        </svg>
+                    </div>
+                    <div class="social-info">
+                        <h4>YouTube</h4>
+                        <p id="youtubeStatus">Not connected</p>
+                    </div>
+                </div>
+                <div class="social-btn-group" id="youtubeBtnGroup">
+                    <button class="social-btn connect" id="youtubeBtn" onclick="connectYouTube()">Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section">
+        <h2 class="section-title">Settings</h2>
+        <div class="settings-list">
+            <div class="settings-item" onclick="openNotifications()">
+                <div class="settings-item-left">
+                    <div class="settings-icon">&#128276;</div>
+                    <span class="settings-label">Notifications</span>
+                </div>
+                <span class="settings-arrow">&#8250;</span>
+            </div>
+            <div class="settings-item" onclick="openPrivacy()">
+                <div class="settings-item-left">
+                    <div class="settings-icon">&#128274;</div>
+                    <span class="settings-label">Privacy</span>
+                </div>
+                <span class="settings-arrow">&#8250;</span>
+            </div>
+            <div class="settings-item" onclick="openHelp()">
+                <div class="settings-item-left">
+                    <div class="settings-icon">&#10067;</div>
+                    <span class="settings-label">Help & Support</span>
+                </div>
+                <span class="settings-arrow">&#8250;</span>
+            </div>
+            <div class="settings-item" onclick="openAbout()">
+                <div class="settings-item-left">
+                    <div class="settings-icon">&#9432;</div>
+                    <span class="settings-label">About</span>
+                </div>
+                <span class="settings-arrow">&#8250;</span>
+            </div>
+        </div>
+        <button class="signout-btn" onclick="logout()">Sign Out</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item">
+            <span class="bottom-nav-icon">&#127968;</span><span>Home</span>
+        </a>
+        <a href="index.html#stories" class="bottom-nav-item">
+            <span class="bottom-nav-icon">&#128218;</span><span>Stories</span>
+        </a>
+        <a href="add-trip.html" class="bottom-nav-item">
+            <span class="bottom-nav-icon" style="font-size: 2rem;">+</span>
+        </a>
+        <a href="index.html#gallery" class="bottom-nav-item">
+            <span class="bottom-nav-icon">&#127748;</span><span>Gallery</span>
+        </a>
+        <a href="profile.html" class="bottom-nav-item active">
+            <span class="bottom-nav-icon">&#128100;</span><span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Social Edit Modal -->
+    <div class="modal-overlay" id="socialEditModal">
+        <div class="social-edit-modal">
+            <div class="modal-header">
+                <h3>Edit Social Links</h3>
+                <button class="modal-close" onclick="closeSocialEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="social-edit-item">
+                    <div class="social-icon instagram" style="width: 40px; height: 40px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </div>
+                    <input type="text" class="form-input" id="editInstagram" placeholder="Instagram username">
+                </div>
+                <div class="social-edit-item">
+                    <div class="social-icon pinterest" style="width: 40px; height: 40px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <input type="text" class="form-input" id="editPinterest" placeholder="Pinterest username">
+                </div>
+                <div class="social-edit-item">
+                    <div class="social-icon youtube" style="width: 40px; height: 40px; border-radius: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                        </svg>
+                    </div>
+                    <input type="text" class="form-input" id="editYoutube" placeholder="YouTube channel name">
+                </div>
+                <p class="social-edit-hint">Leave blank to disconnect. Don't include @ symbol.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeSocialEditModal()">Cancel</button>
+                <button class="modal-btn save" onclick="saveSocialLinks()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Check authentication on load
+        let currentUser = null;
+        let userProfile = null;
+
+        function init() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(userStr);
+            userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+
+            // Populate profile
+            document.getElementById('profileAvatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop';
+            document.getElementById('profileName').textContent = userProfile.name || currentUser.name || 'Travel Explorer';
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileBio').textContent = userProfile.bio || 'Wanderer | Photographer | Storyteller';
+
+            // Populate form
+            document.getElementById('editName').value = userProfile.name || currentUser.name || '';
+            document.getElementById('editBio').value = userProfile.bio || '';
+            document.getElementById('editLocation').value = userProfile.location || '';
+            document.getElementById('editWebsite').value = userProfile.website || '';
+
+            // Update stats
+            const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+            document.getElementById('tripCount').textContent = trips.length || 12;
+
+            // Check connected accounts
+            checkSocialConnections();
+        }
+
+        function checkSocialConnections() {
+            const connections = JSON.parse(localStorage.getItem('socialConnections') || '{}');
+
+            if (connections.instagram) {
+                document.getElementById('instagramStatus').textContent = '@' + connections.instagram;
+                document.getElementById('instagramStatus').classList.add('connected');
+                document.getElementById('instagramBtnGroup').innerHTML = `
+                    <button class="social-btn view" onclick="window.open('https://instagram.com/${connections.instagram}', '_blank')">View</button>
+                `;
+            } else {
+                document.getElementById('instagramStatus').textContent = 'Not connected';
+                document.getElementById('instagramStatus').classList.remove('connected');
+                document.getElementById('instagramBtnGroup').innerHTML = '';
+            }
+
+            if (connections.pinterest) {
+                document.getElementById('pinterestStatus').textContent = '@' + connections.pinterest;
+                document.getElementById('pinterestStatus').classList.add('connected');
+                document.getElementById('pinterestBtnGroup').innerHTML = `
+                    <button class="social-btn view" onclick="window.open('https://pinterest.com/${connections.pinterest}', '_blank')">View</button>
+                `;
+            } else {
+                document.getElementById('pinterestStatus').textContent = 'Not connected';
+                document.getElementById('pinterestStatus').classList.remove('connected');
+                document.getElementById('pinterestBtnGroup').innerHTML = '';
+            }
+
+            if (connections.youtube) {
+                document.getElementById('youtubeStatus').textContent = '@' + connections.youtube;
+                document.getElementById('youtubeStatus').classList.add('connected');
+                document.getElementById('youtubeBtnGroup').innerHTML = `
+                    <button class="social-btn view" onclick="window.open('https://youtube.com/@${connections.youtube}', '_blank')">View</button>
+                `;
+            } else {
+                document.getElementById('youtubeStatus').textContent = 'Not connected';
+                document.getElementById('youtubeStatus').classList.remove('connected');
+                document.getElementById('youtubeBtnGroup').innerHTML = '';
+            }
+        }
+
+        function openSocialEditModal() {
+            const connections = JSON.parse(localStorage.getItem('socialConnections') || '{}');
+            document.getElementById('editInstagram').value = connections.instagram || '';
+            document.getElementById('editPinterest').value = connections.pinterest || '';
+            document.getElementById('editYoutube').value = connections.youtube || '';
+            document.getElementById('socialEditModal').classList.add('active');
+        }
+
+        function closeSocialEditModal() {
+            document.getElementById('socialEditModal').classList.remove('active');
+        }
+
+        function saveSocialLinks() {
+            const instagram = document.getElementById('editInstagram').value.trim().replace('@', '');
+            const pinterest = document.getElementById('editPinterest').value.trim().replace('@', '');
+            const youtube = document.getElementById('editYoutube').value.trim().replace('@', '');
+
+            const connections = {};
+            if (instagram) connections.instagram = instagram;
+            if (pinterest) connections.pinterest = pinterest;
+            if (youtube) connections.youtube = youtube;
+
+            localStorage.setItem('socialConnections', JSON.stringify(connections));
+            checkSocialConnections();
+            closeSocialEditModal();
+            showToast('Social links updated!', 'success');
+        }
+
+        function changeAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileAvatar').src = e.target.result;
+                    currentUser.avatar = e.target.result;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    showToast('Profile photo updated!', 'success');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function saveProfile(e) {
+            e.preventDefault();
+
+            const profile = {
+                name: document.getElementById('editName').value,
+                bio: document.getElementById('editBio').value,
+                location: document.getElementById('editLocation').value,
+                website: document.getElementById('editWebsite').value
+            };
+
+            localStorage.setItem('userProfile', JSON.stringify(profile));
+
+            // Update user name
+            currentUser.name = profile.name;
+            localStorage.setItem('user', JSON.stringify(currentUser));
+
+            // Update display
+            document.getElementById('profileName').textContent = profile.name;
+            document.getElementById('profileBio').textContent = profile.bio || 'Wanderer | Photographer | Storyteller';
+
+            showToast('Profile saved!', 'success');
+        }
+
+        // Social Media OAuth Connections
+        function connectInstagram() {
+            // Instagram Basic Display API OAuth
+            const clientId = 'YOUR_INSTAGRAM_APP_ID'; // Replace with your Instagram App ID
+            const redirectUri = encodeURIComponent(window.location.origin + '/auth/instagram/callback');
+            const scope = 'user_profile,user_media';
+
+            // For demo purposes, simulate connection
+            const username = prompt('Enter your Instagram username to connect:');
+            if (username) {
+                const connections = JSON.parse(localStorage.getItem('socialConnections') || '{}');
+                connections.instagram = username;
+                localStorage.setItem('socialConnections', JSON.stringify(connections));
+                checkSocialConnections();
+                showToast('Instagram connected!', 'success');
+            }
+
+            // Real OAuth flow would be:
+            // window.location.href = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code`;
+        }
+
+        function connectPinterest() {
+            // Pinterest OAuth
+            const clientId = 'YOUR_PINTEREST_APP_ID'; // Replace with your Pinterest App ID
+            const redirectUri = encodeURIComponent(window.location.origin + '/auth/pinterest/callback');
+            const scope = 'read_public,write_public';
+
+            // For demo purposes, simulate connection
+            const username = prompt('Enter your Pinterest username to connect:');
+            if (username) {
+                const connections = JSON.parse(localStorage.getItem('socialConnections') || '{}');
+                connections.pinterest = username;
+                localStorage.setItem('socialConnections', JSON.stringify(connections));
+                checkSocialConnections();
+                showToast('Pinterest connected!', 'success');
+            }
+
+            // Real OAuth flow would be:
+            // window.location.href = `https://api.pinterest.com/oauth/?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code`;
+        }
+
+        function connectYouTube() {
+            // YouTube/Google OAuth
+            const clientId = 'YOUR_GOOGLE_CLIENT_ID'; // Replace with your Google Client ID
+            const redirectUri = encodeURIComponent(window.location.origin + '/auth/youtube/callback');
+            const scope = 'https://www.googleapis.com/auth/youtube.readonly';
+
+            // For demo purposes, simulate connection
+            const username = prompt('Enter your YouTube channel name to connect:');
+            if (username) {
+                const connections = JSON.parse(localStorage.getItem('socialConnections') || '{}');
+                connections.youtube = username;
+                localStorage.setItem('socialConnections', JSON.stringify(connections));
+                checkSocialConnections();
+                showToast('YouTube connected!', 'success');
+            }
+
+            // Real OAuth flow would be:
+            // window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=code&access_type=offline`;
+        }
+
+        function openNotifications() {
+            showToast('Notifications settings coming soon');
+        }
+
+        function openPrivacy() {
+            showToast('Privacy settings coming soon');
+        }
+
+        function openHelp() {
+            showToast('Help & Support coming soon');
+        }
+
+        function openAbout() {
+            showToast('MilesToMemories v1.0');
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            showToast('Signed out successfully');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

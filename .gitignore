@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Database
+*.db
+
+# Environment
+.env
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
+
+# iOS
+MilesToMemories.xcodeproj/xcuserdata/
+MilesToMemories.xcodeproj/project.xcworkspace/xcuserdata/

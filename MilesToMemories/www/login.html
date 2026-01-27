@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#faf8f5">
+    <title>Login | MilesToMemories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sky-blue: #a8ccd7;
+            --sky-blue-light: #d4e8ed;
+            --sandy-beige: #e8dcc4;
+            --sandy-beige-light: #f5f0e6;
+            --forest-green: #4a6741;
+            --forest-green-light: #7a9a6d;
+            --warm-neutral: #c9b99a;
+            --warm-cream: #faf8f5;
+            --soft-gray: #6b6b6b;
+            --dark-text: #2d2d2d;
+            --white: #ffffff;
+            --error-red: #d64545;
+
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--warm-cream);
+            color: var(--dark-text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero Section */
+        .login-hero {
+            position: relative;
+            height: 35vh;
+            min-height: 200px;
+            overflow: hidden;
+        }
+
+        .login-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .login-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .login-logo {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .login-tagline {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+        }
+
+        /* Form Section */
+        .login-form-section {
+            flex: 1;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--sandy-beige);
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--soft-gray);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .login-tab.active {
+            color: var(--forest-green);
+        }
+
+        .login-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--forest-green);
+        }
+
+        .login-form {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .login-form.active {
+            display: flex;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--dark-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            padding: 14px 16px;
+            border: 1px solid var(--sandy-beige);
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--forest-green);
+            box-shadow: 0 0 0 3px rgba(74, 103, 65, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--warm-neutral);
+        }
+
+        .form-error {
+            font-size: 0.8rem;
+            color: var(--error-red);
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--soft-gray);
+        }
+
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--forest-green);
+        }
+
+        .submit-btn {
+            padding: 16px;
+            background: var(--forest-green);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--dark-text);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: var(--soft-gray);
+            font-size: 0.85rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--sandy-beige);
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border: 1px solid var(--sandy-beige);
+            border-radius: 10px;
+            background: var(--white);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .social-btn:hover {
+            background: var(--sandy-beige-light);
+            border-color: var(--warm-neutral);
+        }
+
+        .social-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .guest-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--soft-gray);
+        }
+
+        .guest-link a {
+            color: var(--forest-green);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password {
+            text-align: right;
+            font-size: 0.85rem;
+        }
+
+        .forgot-password a {
+            color: var(--forest-green);
+            text-decoration: none;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-text);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: var(--error-red);
+        }
+
+        .toast.success {
+            background: var(--forest-green);
+        }
+
+        @media (min-width: 768px) {
+            .login-container {
+                flex-direction: row;
+            }
+
+            .login-hero {
+                flex: 1;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .login-form-section {
+                flex: none;
+                width: 450px;
+                padding: 3rem 2.5rem;
+                justify-content: center;
+            }
+
+            .login-logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-hero">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80" alt="Travel">
+            <div class="login-hero-overlay">
+                <h1 class="login-logo">MilesToMemories</h1>
+                <p class="login-tagline">Document your journey, one memory at a time</p>
+            </div>
+        </div>
+
+        <div class="login-form-section">
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchTab('login')">Sign In</button>
+                <button class="login-tab" onclick="switchTab('register')">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+                <button type="submit" class="submit-btn">Sign In</button>
+
+                <div class="divider">or continue with</div>
+
+                <div class="social-login">
+                    <button type="button" class="social-btn" onclick="socialLogin('google')">
+                        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Continue with Google
+                    </button>
+                    <button type="button" class="social-btn" onclick="socialLogin('apple')">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                        Continue with Apple
+                    </button>
+                </div>
+
+                <p class="guest-link">
+                    Just browsing? <a href="index.html">Continue as guest</a>
+                </p>
+            </form>
+
+            <!-- Register Form -->
+            <form class="login-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="registerName" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="Create a password" required minlength="6">
+                    <span class="form-error" id="passwordError">Password must be at least 6 characters</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm your password" required>
+                    <span class="form-error" id="confirmError">Passwords do not match</span>
+                </div>
+                <div class="form-checkbox">
+                    <input type="checkbox" id="agreeTerms" required>
+                    <label for="agreeTerms">I agree to the Terms & Privacy Policy</label>
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+
+                <p class="guest-link">
+                    Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Demo credentials
+        const DEMO_USER = {
+            email: 'demo@milestomemories.com',
+            password: 'demo123',
+            name: 'Travel Explorer',
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
+        };
+
+        // Check if already logged in
+        if (localStorage.getItem('user')) {
+            window.location.href = 'index.html';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+
+            if (tab === 'login') {
+                document.querySelector('.login-tab:first-child').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.login-tab:last-child').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('rememberMe').checked;
+
+            // Check demo credentials or any registered user
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            const user = registeredUsers.find(u => u.email === email && u.password === password);
+
+            if ((email === DEMO_USER.email && password === DEMO_USER.password) || user) {
+                const loggedInUser = user || DEMO_USER;
+                localStorage.setItem('user', JSON.stringify({
+                    email: loggedInUser.email,
+                    name: loggedInUser.name,
+                    avatar: loggedInUser.avatar || DEMO_USER.avatar,
+                    isOwner: true
+                }));
+                showToast('Welcome back!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                showToast('Invalid email or password', 'error');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate password
+            if (password.length < 6) {
+                document.getElementById('passwordError').classList.add('show');
+                return;
+            } else {
+                document.getElementById('passwordError').classList.remove('show');
+            }
+
+            // Check password match
+            if (password !== confirmPassword) {
+                document.getElementById('confirmError').classList.add('show');
+                return;
+            } else {
+                document.getElementById('confirmError').classList.remove('show');
+            }
+
+            // Save user
+            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+
+            // Check if email already exists
+            if (registeredUsers.find(u => u.email === email)) {
+                showToast('Email already registered', 'error');
+                return;
+            }
+
+            registeredUsers.push({ name, email, password });
+            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+
+            // Auto login
+            localStorage.setItem('user', JSON.stringify({
+                email,
+                name,
+                avatar: DEMO_USER.avatar,
+                isOwner: true
+            }));
+
+            showToast('Account created successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        function socialLogin(provider) {
+            // Simulate social login
+            localStorage.setItem('user', JSON.stringify({
+                email: `user@${provider}.com`,
+                name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
+                avatar: DEMO_USER.avatar,
+                isOwner: true
+            }));
+            showToast(`Signed in with ${provider}!`, 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.className = 'toast', 3000);
+        }
+    </script>
+</body>
+</html>

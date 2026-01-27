@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Trip | MilesToMemories</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables - Natural Color Palette */
+        :root {
+            --sky-blue: #a8ccd7;
+            --sky-blue-light: #d4e8ed;
+            --sandy-beige: #e8dcc4;
+            --sandy-beige-light: #f5f0e6;
+            --forest-green: #4a6741;
+            --forest-green-light: #7a9a6d;
+            --warm-neutral: #c9b99a;
+            --warm-cream: #faf8f5;
+            --soft-gray: #6b6b6b;
+            --dark-text: #2d2d2d;
+            --white: #ffffff;
+            --error-red: #c44d4d;
+            --success-green: #4a6741;
+
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 4rem;
+            --spacing-xl: 6rem;
+
+            --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.15s ease;
+
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            font-weight: 300;
+            color: var(--dark-text);
+            background-color: var(--warm-cream);
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-serif);
+            font-weight: 500;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(250, 248, 245, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--dark-text);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-md);
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: var(--soft-gray);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            padding-bottom: 4px;
+            transition: var(--transition-fast);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--forest-green);
+            transition: var(--transition-medium);
+        }
+
+        .nav-links a:hover {
+            color: var(--forest-green);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .nav-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--dark-text);
+            transition: var(--transition-fast);
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: calc(var(--spacing-xl) + 80px) var(--spacing-lg) var(--spacing-lg);
+            text-align: center;
+            background: linear-gradient(135deg, var(--sky-blue-light) 0%, var(--sandy-beige-light) 100%);
+        }
+
+        .page-header h1 {
+            color: var(--dark-text);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .page-header p {
+            font-size: 1.125rem;
+            color: var(--soft-gray);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .form-section {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--sandy-beige-light);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-section-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--sandy-beige-light);
+            border-radius: 50%;
+            font-size: 1.25rem;
+        }
+
+        .form-section-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark-text);
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--sandy-beige);
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            color: var(--dark-text);
+            background: var(--warm-cream);
+            transition: var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--forest-green);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(74, 103, 65, 0.1);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--soft-gray);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right var(--spacing-md) center;
+            padding-right: calc(var(--spacing-md) * 2 + 12px);
+        }
+
+        /* Mood Selector */
+        .mood-selector {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .mood-option {
+            position: relative;
+        }
+
+        .mood-option input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .mood-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 2px solid var(--sandy-beige);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            min-width: 90px;
+        }
+
+        .mood-option label:hover {
+            border-color: var(--forest-green-light);
+            background: var(--sandy-beige-light);
+        }
+
+        .mood-option input:checked + label {
+            border-color: var(--forest-green);
+            background: rgba(74, 103, 65, 0.1);
+        }
+
+        .mood-emoji {
+            font-size: 1.75rem;
+        }
+
+        .mood-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--soft-gray);
+        }
+
+        .mood-option input:checked + label .mood-label {
+            color: var(--forest-green);
+            font-weight: 500;
+        }
+
+        /* Photo Upload */
+        .photo-upload-area {
+            border: 2px dashed var(--sandy-beige);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            text-align: center;
+            transition: var(--transition-fast);
+            cursor: pointer;
+            background: var(--warm-cream);
+        }
+
+        .photo-upload-area:hover {
+            border-color: var(--forest-green-light);
+            background: var(--sandy-beige-light);
+        }
+
+        .photo-upload-area.dragover {
+            border-color: var(--forest-green);
+            background: rgba(74, 103, 65, 0.1);
+        }
+
+        .photo-upload-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .photo-upload-text {
+            font-size: 1rem;
+            color: var(--soft-gray);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .photo-upload-hint {
+            font-size: 0.875rem;
+            color: var(--warm-neutral);
+        }
+
+        .photo-input {
+            display: none;
+        }
+
+        /* Photo Preview Grid */
+        .photo-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .photo-preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .photo-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--white);
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .photo-preview-item:hover .photo-preview-remove {
+            opacity: 1;
+        }
+
+        .photo-preview-remove:hover {
+            background: var(--error-red);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            padding: var(--spacing-lg);
+            background: var(--sandy-beige-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .btn-primary {
+            background: var(--forest-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-text);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--soft-gray);
+            border: 1px solid var(--sandy-beige);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--forest-green);
+            color: var(--forest-green);
+        }
+
+        .btn-lg {
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 1rem;
+        }
+
+        /* Character Counter */
+        .char-counter {
+            font-size: 0.75rem;
+            color: var(--soft-gray);
+            text-align: right;
+            margin-top: var(--spacing-xs);
+        }
+
+        .char-counter.warning {
+            color: var(--error-red);
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: var(--sky-blue-light);
+            border-left: 4px solid var(--sky-blue);
+            padding: var(--spacing-md);
+            border-radius: 0 8px 8px 0;
+            margin-top: var(--spacing-md);
+        }
+
+        .tip-box-title {
+            font-weight: 500;
+            color: var(--dark-text);
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .tip-box p {
+            font-size: 0.9375rem;
+            color: var(--soft-gray);
+            margin: 0;
+        }
+
+        /* Success Toast */
+        .toast {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            background: var(--forest-green);
+            color: var(--white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition-medium);
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Footer */
+        .footer {
+            padding: var(--spacing-lg);
+            text-align: center;
+            background: var(--dark-text);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .footer a {
+            color: var(--sandy-beige);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: var(--spacing-sm) var(--spacing-md);
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background: var(--warm-cream);
+                transition: right var(--transition-medium);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-toggle {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .mood-selector {
+                justify-content: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .photo-preview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: fadeInUp 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="index.html" class="nav-logo">MilesToMemories</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html#stories">Stories</a></li>
+            <li><a href="index.html#gallery">Gallery</a></li>
+            <li><a href="index.html#destinations">Destinations</a></li>
+            <li><a href="add-trip.html">Add Trip</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1>Document Your Journey</h1>
+        <p>Capture the moments, places, and feelings that made your trip unforgettable</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <form class="form-container" id="tripForm">
+            <!-- Basic Details Section -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">&#9992;</div>
+                    <h2 class="form-section-title">Trip Details</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="title">Trip Title</label>
+                    <input type="text" class="form-input" id="title" name="title"
+                           placeholder="e.g., A Week in the Swiss Alps" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="location">Location</label>
+                        <input type="text" class="form-input" id="location" name="location"
+                               placeholder="e.g., Interlaken, Switzerland" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="date">Date</label>
+                        <input type="date" class="form-input" id="date" name="date" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Story Section -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">&#9998;</div>
+                    <h2 class="form-section-title">Your Story</h2>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-textarea" id="description" name="description"
+                              placeholder="Tell the story of your journey... What did you discover? Who did you meet? What moments will you never forget?"
+                              maxlength="2000"></textarea>
+                    <div class="char-counter" id="charCounter">0 / 2000</div>
+                </div>
+
+                <div class="tip-box">
+                    <div class="tip-box-title">&#128161; Writing Tip</div>
+                    <p>Focus on specific moments rather than listing activities. Describe the scent of morning coffee at that little cafe, the sound of waves at sunset, or the unexpected conversation that changed your perspective.</p>
+                </div>
+            </div>
+
+            <!-- Mood Section -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">&#10084;</div>
+                    <h2 class="form-section-title">How Did It Feel?</h2>
+                </div>
+
+                <div class="mood-selector">
+                    <div class="mood-option">
+                        <input type="radio" id="mood-excited" name="mood" value="excited">
+                        <label for="mood-excited">
+                            <span class="mood-emoji">&#128525;</span>
+                            <span class="mood-label">Excited</span>
+                        </label>
+                    </div>
+                    <div class="mood-option">
+                        <input type="radio" id="mood-relaxed" name="mood" value="relaxed">
+                        <label for="mood-relaxed">
+                            <span class="mood-emoji">&#128524;</span>
+                            <span class="mood-label">Relaxed</span>
+                        </label>
+                    </div>
+                    <div class="mood-option">
+                        <input type="radio" id="mood-adventurous" name="mood" value="adventurous">
+                        <label for="mood-adventurous">
+                            <span class="mood-emoji">&#129302;</span>
+                            <span class="mood-label">Adventurous</span>
+                        </label>
+                    </div>
+                    <div class="mood-option">
+                        <input type="radio" id="mood-nostalgic" name="mood" value="nostalgic">
+                        <label for="mood-nostalgic">
+                            <span class="mood-emoji">&#128173;</span>
+                            <span class="mood-label">Nostalgic</span>
+                        </label>
+                    </div>
+                    <div class="mood-option">
+                        <input type="radio" id="mood-neutral" name="mood" value="neutral" checked>
+                        <label for="mood-neutral">
+                            <span class="mood-emoji">&#128578;</span>
+                            <span class="mood-label">Peaceful</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photos Section -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">&#128247;</div>
+                    <h2 class="form-section-title">Photos</h2>
+                </div>
+
+                <div class="photo-upload-area" id="dropZone">
+                    <div class="photo-upload-icon">&#128444;</div>
+                    <p class="photo-upload-text">Drag and drop your photos here, or click to browse</p>
+                    <p class="photo-upload-hint">Supports JPG, PNG, GIF, WEBP (max 10MB each)</p>
+                    <input type="file" class="photo-input" id="photos" name="photos"
+                           accept="image/jpeg,image/png,image/gif,image/webp" multiple>
+                </div>
+
+                <div class="photo-preview-grid" id="photoPreview"></div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="index.html" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Save Memory &#10145;
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 <a href="index.html">MilesToMemories</a>. Made with love from the road.</p>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>&#10004;</span>
+        <span id="toastMessage">Trip saved successfully!</span>
+    </div>
+
+    <script>
+        // Check Authentication - Only owners can add trips
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (!currentUser) {
+            alert('Please sign in to add a trip');
+            window.location.href = 'login.html';
+        }
+
+        // Mobile Navigation
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Character Counter
+        const description = document.getElementById('description');
+        const charCounter = document.getElementById('charCounter');
+
+        description.addEventListener('input', () => {
+            const length = description.value.length;
+            charCounter.textContent = `${length} / 2000`;
+            charCounter.classList.toggle('warning', length > 1800);
+        });
+
+        // Photo Upload
+        const dropZone = document.getElementById('dropZone');
+        const photoInput = document.getElementById('photos');
+        const photoPreview = document.getElementById('photoPreview');
+        let selectedFiles = [];
+
+        dropZone.addEventListener('click', () => photoInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) {
+                    selectedFiles.push(file);
+                    addPreview(file);
+                }
+            });
+        }
+
+        function addPreview(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div');
+                div.className = 'photo-preview-item';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <button type="button" class="photo-preview-remove" onclick="removePhoto(this)">&times;</button>
+                `;
+                div.dataset.fileName = file.name;
+                photoPreview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(btn) {
+            const item = btn.parentElement;
+            const fileName = item.dataset.fileName;
+            selectedFiles = selectedFiles.filter(f => f.name !== fileName);
+            item.remove();
+        }
+
+        // Form Submission
+        const form = document.getElementById('tripForm');
+        const toast = document.getElementById('toast');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value;
+            const description = document.getElementById('description').value;
+            const mood = document.querySelector('input[name="mood"]:checked').value;
+
+            // Get photo as base64
+            let imageData = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80';
+            if (selectedFiles.length > 0) {
+                const reader = new FileReader();
+                imageData = await new Promise(resolve => {
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(selectedFiles[0]);
+                });
+            }
+
+            // Format date
+            const dateObj = new Date(date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            // Create new trip object
+            const newTrip = {
+                id: Date.now(),
+                title: title,
+                location: location,
+                date: formattedDate,
+                image: imageData,
+                description: description,
+                mood: mood,
+                likes: 0,
+                liked: false,
+                saved: false,
+                comments: []
+            };
+
+            // Save to localStorage
+            const existingTrips = JSON.parse(localStorage.getItem('userTrips') || '[]');
+            existingTrips.unshift(newTrip);
+            localStorage.setItem('userTrips', JSON.stringify(existingTrips));
+
+            showToast('Trip saved successfully!');
+
+            // Redirect to home after delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+
+        function showToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Set today as default date
+        document.getElementById('date').valueAsDate = new Date();
+    </script>
+</body>
+</html>
