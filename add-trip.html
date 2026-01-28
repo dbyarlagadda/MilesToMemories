@@ -647,6 +647,7 @@
             animation: fadeInUp 0.6s ease;
         }
     </style>
+    <script src="api.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -905,6 +906,16 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showToast('Please log in to save trips');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+
             const title = document.getElementById('title').value;
             const location = document.getElementById('location').value;
             const date = document.getElementById('date').value;
@@ -925,32 +936,42 @@
             const dateObj = new Date(date);
             const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-            // Create new trip object
-            const newTrip = {
-                id: Date.now(),
+            // Create trip data for API
+            const tripData = {
                 title: title,
                 location: location,
                 date: formattedDate,
-                image: imageData,
+                image_url: imageData,
                 description: description,
-                mood: mood,
-                likes: 0,
-                liked: false,
-                saved: false,
-                comments: []
+                mood: mood
             };
 
-            // Save to localStorage
-            const existingTrips = JSON.parse(localStorage.getItem('userTrips') || '[]');
-            existingTrips.unshift(newTrip);
-            localStorage.setItem('userTrips', JSON.stringify(existingTrips));
+            try {
+                // Save to database via API
+                const response = await fetch(API_BASE + '/trips', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(tripData)
+                });
 
-            showToast('Trip saved successfully!');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save trip');
+                }
 
-            // Redirect to home after delay
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+                showToast('Trip saved successfully!');
+
+                // Redirect to home after delay
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } catch (error) {
+                console.error('Error saving trip:', error);
+                showToast('Error: ' + error.message);
+            }
         });
 
         function showToast(message) {

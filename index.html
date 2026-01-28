@@ -1524,134 +1524,6 @@
             height: 100%;
         }
 
-        .timeline-container {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 16px;
-            z-index: 1000;
-        }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .timeline-title {
-            font-family: var(--font-serif);
-            font-size: 1rem;
-            color: var(--white);
-        }
-
-        .timeline-filter {
-            display: flex;
-            gap: 8px;
-        }
-
-        .timeline-filter-btn {
-            padding: 6px 12px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .timeline-filter-btn.active,
-        .timeline-filter-btn:hover {
-            background: var(--forest-green);
-            border-color: var(--forest-green);
-            color: var(--white);
-        }
-
-        .timeline-scroll {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .timeline-scroll::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .timeline-scroll::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-
-        .timeline-scroll::-webkit-scrollbar-thumb {
-            background: var(--forest-green);
-            border-radius: 2px;
-        }
-
-        .timeline-item {
-            flex-shrink: 0;
-            width: 160px;
-            scroll-snap-align: start;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .timeline-item:hover {
-            transform: translateY(-2px);
-        }
-
-        .timeline-item.active .timeline-image {
-            border-color: var(--forest-green);
-        }
-
-        .timeline-image {
-            width: 100%;
-            aspect-ratio: 16/10;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .timeline-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .timeline-info {
-            padding: 8px 2px;
-        }
-
-        .timeline-date {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--forest-green-light);
-            margin-bottom: 2px;
-        }
-
-        .timeline-location {
-            font-size: 0.85rem;
-            color: var(--white);
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .timeline-title-small {
-            display: none;
-        }
-
         .map-marker-popup {
             text-align: center;
         }
@@ -1686,12 +1558,6 @@
         @media (min-width: 768px) {
             .map-container {
                 height: 550px;
-            }
-
-            .timeline-container {
-                bottom: 24px;
-                left: 24px;
-                right: 24px;
             }
         }
 
@@ -2038,7 +1904,7 @@
         </div>
     </section>
 
-    <!-- Map Timeline -->
+    <!-- Map Section -->
     <section class="map-timeline-section" id="map">
         <div class="section-header fade-in">
             <p class="section-label">Journey Tracker</p>
@@ -2047,17 +1913,6 @@
         <div class="map-timeline-container">
             <div class="map-container">
                 <div id="tripMap"></div>
-            </div>
-            <div class="timeline-container">
-                <div class="timeline-header">
-                    <span class="timeline-title">Timeline</span>
-                    <div class="timeline-filter">
-                        <button class="timeline-filter-btn active" onclick="filterTimeline('all')">All</button>
-                        <button class="timeline-filter-btn" onclick="filterTimeline('2024')">2024</button>
-                        <button class="timeline-filter-btn" onclick="filterTimeline('2023')">2023</button>
-                    </div>
-                </div>
-                <div class="timeline-scroll" id="timelineScroll"></div>
             </div>
         </div>
     </section>
@@ -2811,23 +2666,40 @@
             setTimeout(() => btn.textContent = 'Subscribe', 3000);
         });
 
-        // Render Destinations
+        // Render Destinations - only show destinations where user has trips
         function renderDestinations() {
+            const section = document.getElementById('destinations');
             const list = document.getElementById('destinationsList');
             const destNames = Object.keys(destinations);
 
-            // Count trips per destination
-            const counts = {};
+            // Hide section if user has no trips
+            if (trips.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            // Count trips per destination and filter to only show destinations with trips
+            const destinationsWithTrips = [];
             destNames.forEach(dest => {
                 const keywords = destinations[dest].keywords;
-                counts[dest] = trips.filter(trip =>
+                const count = trips.filter(trip =>
                     keywords.some(kw => trip.location.toLowerCase().includes(kw.toLowerCase()))
                 ).length;
+                if (count > 0) {
+                    destinationsWithTrips.push({ name: dest, count: count });
+                }
             });
 
-            list.innerHTML = destNames.map(dest => `
-                <button class="destination-tag" onclick="openDestinationModal('${dest}')">
-                    ${dest} ${counts[dest] > 0 ? `<span style="opacity:0.6">(${counts[dest]})</span>` : ''}
+            // Hide section if no matching destinations
+            if (destinationsWithTrips.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            list.innerHTML = destinationsWithTrips.map(dest => `
+                <button class="destination-tag" onclick="openDestinationModal('${dest.name}')">
+                    ${dest.name} <span style="opacity:0.6">(${dest.count})</span>
                 </button>
             `).join('');
         }
@@ -3017,7 +2889,6 @@
 
         let map = null;
         let markers = [];
-        let currentFilter = 'all';
 
         function initMap() {
             try {
@@ -3048,7 +2919,6 @@
 
                 // Add markers for each trip
                 addTripMarkers();
-                renderTimeline();
             } catch (error) {
                 console.error('Error initializing map:', error);
             }
@@ -3059,42 +2929,58 @@
             markers.forEach(m => map.removeLayer(m));
             markers = [];
 
-            const filteredTrips = getFilteredTrips();
             const bounds = [];
 
-            filteredTrips.forEach((trip, index) => {
+            trips.forEach((trip) => {
                 const coords = getCoordinates(trip.location);
                 if (coords) {
+                    // Create a small circular photo icon
                     const customIcon = L.divIcon({
                         className: 'custom-marker',
-                        html: `<div style="background: var(--forest-green); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border: 3px solid white;">${index + 1}</div>`,
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 15]
+                        html: `<div class="map-trip-icon" style="
+                            width: 44px;
+                            height: 44px;
+                            border-radius: 50%;
+                            overflow: hidden;
+                            border: 3px solid white;
+                            box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+                            cursor: pointer;
+                        ">
+                            <img src="${trip.image}" style="width: 100%; height: 100%; object-fit: cover;" alt="${trip.title}">
+                        </div>`,
+                        iconSize: [44, 44],
+                        iconAnchor: [22, 22]
                     });
 
                     const marker = L.marker([coords.lat, coords.lng], { icon: customIcon })
                         .addTo(map)
                         .bindPopup(`
-                            <div class="map-marker-popup">
-                                <img src="${trip.image}" alt="${trip.title}">
-                                <h4>${trip.title}</h4>
-                                <p>${trip.location}</p>
-                                <p>${trip.date}</p>
+                            <div class="map-marker-popup" style="min-width: 200px;">
+                                <img src="${trip.image}" alt="${trip.title}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                                <h4 style="margin: 0 0 5px 0; font-size: 14px;">${trip.title}</h4>
+                                <p style="margin: 0 0 3px 0; font-size: 12px; color: #666;">${trip.location}</p>
+                                <p style="margin: 0 0 10px 0; font-size: 11px; color: #999;">${trip.date}</p>
+                                <button onclick="openTripModal(${trip.id})" style="
+                                    width: 100%;
+                                    padding: 8px;
+                                    background: #4a6741;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-size: 12px;
+                                ">View Trip Details</button>
                             </div>
-                        `);
-
-                    marker.on('click', () => {
-                        highlightTimelineItem(trip.id);
-                    });
+                        `, { maxWidth: 250 });
 
                     markers.push(marker);
                     bounds.push([coords.lat, coords.lng]);
                 }
             });
 
-            // Fit map to show all markers (extra bottom padding for timeline overlay)
+            // Fit map to show all markers
             if (bounds.length > 0) {
-                map.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 180] });
+                map.fitBounds(bounds, { padding: [50, 50] });
             }
         }
 
@@ -3110,88 +2996,6 @@
                 }
             }
             return null;
-        }
-
-        function getFilteredTrips() {
-            if (currentFilter === 'all') {
-                return trips;
-            }
-            return trips.filter(trip => trip.date.includes(currentFilter));
-        }
-
-        function renderTimeline() {
-            const container = document.getElementById('timelineScroll');
-            const filteredTrips = getFilteredTrips();
-
-            if (filteredTrips.length === 0) {
-                container.innerHTML = `
-                    <div style="padding: 20px; text-align: center; color: #888;">
-                        <p>No trips yet</p>
-                        <p style="font-size: 0.9em;">Add your first trip to see it on the map!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filteredTrips.map(trip => `
-                <div class="timeline-item" data-id="${trip.id}" onclick="selectTimelineItem(${trip.id})">
-                    <div class="timeline-image">
-                        <img src="${trip.image}" alt="${trip.title}">
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-date">${trip.date}</div>
-                        <div class="timeline-location">${trip.location}</div>
-                        <div class="timeline-title-small">${trip.title}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterTimeline(filter) {
-            currentFilter = filter;
-
-            // Update button states
-            document.querySelectorAll('.timeline-filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent.toLowerCase().includes(filter.toLowerCase()) ||
-                    (filter === 'all' && btn.textContent === 'All')) {
-                    btn.classList.add('active');
-                }
-            });
-
-            addTripMarkers();
-            renderTimeline();
-        }
-
-        function selectTimelineItem(tripId) {
-            const trip = trips.find(t => t.id === tripId);
-            if (!trip) return;
-
-            // Highlight timeline item
-            highlightTimelineItem(tripId);
-
-            // Pan to marker and open popup
-            const coords = getCoordinates(trip.location);
-            if (coords) {
-                map.setView([coords.lat, coords.lng], 6);
-                const markerIndex = getFilteredTrips().findIndex(t => t.id === tripId);
-                if (markers[markerIndex]) {
-                    markers[markerIndex].openPopup();
-                }
-            }
-
-            // Open trip modal
-            openTripModal(tripId);
-        }
-
-        function highlightTimelineItem(tripId) {
-            document.querySelectorAll('.timeline-item').forEach(item => {
-                item.classList.remove('active');
-                if (parseInt(item.dataset.id) === tripId) {
-                    item.classList.add('active');
-                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-            });
         }
 
         // Initialize
