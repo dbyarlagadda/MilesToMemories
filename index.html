@@ -3059,21 +3059,38 @@
         let currentFilter = 'all';
 
         function initMap() {
-            // Initialize map centered on world view
-            map = L.map('tripMap', {
-                scrollWheelZoom: false
-            }).setView([30, 0], 2);
+            try {
+                // Check if map container exists
+                const mapContainer = document.getElementById('tripMap');
+                if (!mapContainer) {
+                    console.error('Map container not found');
+                    return;
+                }
 
-            // Add tile layer with a nice style
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
+                // Initialize map centered on world view
+                map = L.map('tripMap', {
+                    scrollWheelZoom: false,
+                    zoomControl: true
+                }).setView([30, 0], 2);
 
-            // Add markers for each trip
-            addTripMarkers();
-            renderTimeline();
+                // Add tile layer with a nice style
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Force map to recalculate size (fixes rendering issues)
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+
+                // Add markers for each trip
+                addTripMarkers();
+                renderTimeline();
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
         }
 
         function addTripMarkers() {
@@ -3220,8 +3237,16 @@
         checkAuth();
         loadTripsFromAPI(); // Load trips from database API
 
-        // Initialize map after DOM is ready
-        setTimeout(initMap, 100);
+        // Initialize map after DOM is ready and Leaflet is loaded
+        setTimeout(() => {
+            if (typeof L !== 'undefined') {
+                initMap();
+            } else {
+                console.error('Leaflet not loaded');
+                // Retry after 500ms
+                setTimeout(initMap, 500);
+            }
+        }, 200);
     </script>
 </body>
 </html>
