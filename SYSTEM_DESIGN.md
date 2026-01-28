@@ -24,21 +24,25 @@
 │                      milestomemories.mooo.com (FreeDNS)                     │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
-                    ┌───────────────┴───────────────┐
-                    │                               │
-                    ▼                               ▼
-┌───────────────────────────────┐   ┌───────────────────────────────┐
-│        NGINX (Port 80)        │   │     Node.js API (Port 3000)   │
-│     Static File Server        │   │        Express.js             │
-│   - index.html                │   │   - /api/auth/*               │
-│   - login.html                │   │   - /api/trips/*              │
-│   - add-trip.html             │   │   - /api/users/*              │
-│   - profile.html              │   │   - /api/comments/*           │
-│   - admin.html                │   │   - /api/admin/*              │
-│   - api.js, CSS, images       │   │                               │
-└───────────────────────────────┘   └───────────────┬───────────────┘
-                                                    │
-                                                    ▼
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    NGINX (Port 443 SSL + Port 80 redirect)                  │
+│                      SSL Termination + Reverse Proxy                        │
+├─────────────────────────────────┬───────────────────────────────────────────┤
+│     Static Files                │        API Proxy (/api/*)                 │
+│   - index.html, login.html      │   proxy_pass → localhost:3000             │
+│   - add-trip.html, profile.html │   - /api/auth/*                           │
+│   - api.js, CSS, images         │   - /api/trips/*, /api/users/*            │
+└─────────────────────────────────┴───────────────────────────────────────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │     Node.js API (Port 3000)   │
+                    │        Express.js             │
+                    └───────────────┬───────────────┘
+                                    │
+                                    ▼
                                     ┌───────────────────────────────┐
                                     │      Amazon RDS (PostgreSQL)  │
                                     │   Aurora PostgreSQL Cluster   │
@@ -235,6 +239,8 @@ Port: 5432
 ```
 Domain: milestomemories.mooo.com (FreeDNS)
 Points to: 3.82.20.152
+URL: https://milestomemories.mooo.com
+SSL: Let's Encrypt (auto-renewed every 90 days)
 ```
 
 ---
@@ -290,37 +296,65 @@ Points to: 3.82.20.152
 
 ## 6. Security
 
-### 6.1 Authentication
+### 6.1 SSL/TLS (HTTPS)
+
+**Certificate Provider:** Let's Encrypt (Free)
+```
+Certificate: /etc/letsencrypt/live/milestomemories.mooo.com/fullchain.pem
+Private Key: /etc/letsencrypt/live/milestomemories.mooo.com/privkey.pem
+Validity: 90 days (auto-renewed)
+```
+
+**HTTPS Configuration:**
+- All HTTP traffic automatically redirects to HTTPS (301)
+- TLS 1.2+ with modern cipher suites
+- API requests proxied through nginx SSL termination
+- Auto-renewal via certbot-renew.timer
+
+### 6.2 Authentication
 
 - **Password Hashing:** bcryptjs with salt rounds = 10
 - **Token:** JWT with 7-day expiration
 - **Storage:** Token stored in localStorage
 
-### 6.2 Authorization
+### 6.3 Authorization
 
 - Trip edit/delete: Owner only
 - Comment delete: Owner only
 - Admin routes: No auth (should add admin auth)
 
-### 6.3 Security Headers
+### 6.4 CORS Configuration
 
 ```javascript
-// CORS Configuration
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*',
     credentials: true
 }));
 ```
 
-### 6.4 Recommendations for Production
+### 6.5 Nginx Security
 
+```nginx
+# API Proxy with headers
+location /api/ {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+### 6.6 Recommendations for Production
+
+- [x] Implement HTTPS (SSL/TLS)
 - [ ] Add rate limiting
-- [ ] Implement HTTPS (SSL/TLS)
 - [ ] Add admin authentication
 - [ ] Use environment-specific CORS
 - [ ] Add input sanitization
 - [ ] Implement CSRF protection
 - [ ] Add request logging
+- [ ] Add security headers (HSTS, CSP, X-Frame-Options)
 
 ---
 
@@ -553,5 +587,5 @@ pm2 restart milestomemories --update-env
 
 ---
 
-*Document Version: 1.1*
+*Document Version: 1.2*
 *Last Updated: January 28, 2026*
