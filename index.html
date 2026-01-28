@@ -1506,16 +1506,14 @@
         }
 
         .map-timeline-container {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-lg);
-            max-width: 1200px;
+            position: relative;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
         .map-container {
             width: 100%;
-            height: 400px;
+            height: 500px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -1527,21 +1525,28 @@
         }
 
         .timeline-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: var(--spacing-md);
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 1000;
         }
 
         .timeline-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--spacing-md);
+            margin-bottom: 12px;
         }
 
         .timeline-title {
             font-family: var(--font-serif);
-            font-size: 1.25rem;
+            font-size: 1rem;
             color: var(--white);
         }
 
@@ -1551,12 +1556,12 @@
         }
 
         .timeline-filter-btn {
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: none;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -1593,14 +1598,14 @@
 
         .timeline-item {
             flex-shrink: 0;
-            width: 200px;
+            width: 160px;
             scroll-snap-align: start;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
         .timeline-item:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
         }
 
         .timeline-item.active .timeline-image {
@@ -1609,10 +1614,10 @@
 
         .timeline-image {
             width: 100%;
-            aspect-ratio: 4/3;
-            border-radius: 12px;
+            aspect-ratio: 16/10;
+            border-radius: 8px;
             overflow: hidden;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
             transition: border-color 0.2s;
         }
 
@@ -1623,33 +1628,28 @@
         }
 
         .timeline-info {
-            padding: 12px 4px;
+            padding: 8px 2px;
         }
 
         .timeline-date {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--forest-green-light);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .timeline-location {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: var(--white);
             font-weight: 500;
-            margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .timeline-title-small {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: none;
         }
 
         .map-marker-popup {
@@ -1684,29 +1684,14 @@
         }
 
         @media (min-width: 768px) {
-            .map-timeline-container {
-                flex-direction: row;
-            }
-
             .map-container {
-                flex: 2;
-                height: 500px;
+                height: 550px;
             }
 
             .timeline-container {
-                flex: 1;
-                max-width: 350px;
-            }
-
-            .timeline-scroll {
-                flex-direction: column;
-                overflow-x: visible;
-                overflow-y: auto;
-                max-height: 420px;
-            }
-
-            .timeline-item {
-                width: 100%;
+                bottom: 24px;
+                left: 24px;
+                right: 24px;
             }
         }
 
@@ -1848,10 +1833,6 @@
                 height: 600px;
             }
 
-            .timeline-container {
-                max-width: 400px;
-            }
-
             .trip-modal {
                 max-width: 600px;
             }
@@ -1885,10 +1866,6 @@
                 grid-row: span 2;
             }
 
-            .map-timeline-container {
-                gap: var(--spacing-xl);
-            }
-
             .map-container {
                 height: 650px;
             }
@@ -1901,9 +1878,12 @@
         /* Extra Large Screens */
         @media (min-width: 1920px) {
             .stories-grid,
-            .gallery-grid,
-            .map-timeline-container {
+            .gallery-grid {
                 max-width: 1600px;
+            }
+
+            .map-timeline-container {
+                max-width: 1800px;
             }
 
             .hero h1 {
@@ -1925,25 +1905,6 @@
             .gallery-item:first-child {
                 grid-column: span 2;
                 grid-row: span 2;
-            }
-
-            .map-timeline-container {
-                flex-direction: column;
-            }
-
-            .timeline-container {
-                max-width: 100%;
-            }
-
-            .timeline-scroll {
-                flex-direction: row;
-                overflow-x: auto;
-                overflow-y: visible;
-                max-height: none;
-            }
-
-            .timeline-item {
-                width: 200px;
             }
         }
 
@@ -3131,9 +3092,9 @@
                 }
             });
 
-            // Fit map to show all markers
+            // Fit map to show all markers (extra bottom padding for timeline overlay)
             if (bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [50, 50] });
+                map.fitBounds(bounds, { paddingTopLeft: [50, 50], paddingBottomRight: [50, 180] });
             }
         }
 
