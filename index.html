@@ -1555,6 +1555,204 @@
             margin: 12px;
         }
 
+        /* Timeline below map */
+        .map-timeline {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .map-timeline::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .map-timeline::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .map-timeline::-webkit-scrollbar-thumb {
+            background: var(--forest-green);
+            border-radius: 2px;
+        }
+
+        .timeline-trip {
+            flex-shrink: 0;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            scroll-snap-align: start;
+            transition: transform 0.2s;
+        }
+
+        .timeline-trip:hover {
+            transform: scale(1.05);
+        }
+
+        .timeline-trip-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 8px;
+            border: 3px solid rgba(255,255,255,0.3);
+            transition: border-color 0.2s;
+        }
+
+        .timeline-trip.active .timeline-trip-thumb {
+            border-color: var(--forest-green);
+        }
+
+        .timeline-trip-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .timeline-trip-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Trip detail panel */
+        .trip-detail-panel {
+            display: none;
+            background: rgba(0,0,0,0.9);
+            border-radius: 16px;
+            margin-top: 20px;
+            padding: 20px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .trip-detail-panel.active {
+            display: block;
+        }
+
+        .trip-detail-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .trip-detail-close:hover {
+            opacity: 1;
+        }
+
+        .trip-detail-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .trip-detail-header {
+            text-align: center;
+        }
+
+        .trip-detail-header h3 {
+            color: white;
+            margin: 0 0 5px;
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+        }
+
+        .trip-detail-header p {
+            color: rgba(255,255,255,0.6);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .trip-detail-photos {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .trip-detail-photo {
+            flex-shrink: 0;
+            width: 200px;
+            height: 150px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .trip-detail-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .trip-detail-photo:hover img {
+            transform: scale(1.05);
+        }
+
+        .trip-detail-description {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .trip-detail-btn {
+            align-self: center;
+            padding: 10px 24px;
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .trip-detail-btn:hover {
+            background: var(--forest-green-light);
+        }
+
+        @media (min-width: 768px) {
+            .timeline-trip {
+                width: 100px;
+            }
+
+            .timeline-trip-thumb {
+                width: 70px;
+                height: 70px;
+            }
+
+            .trip-detail-content {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .trip-detail-header {
+                width: 100%;
+            }
+
+            .trip-detail-photos {
+                flex: 2;
+            }
+
+            .trip-detail-description {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
         @media (min-width: 768px) {
             .map-container {
                 height: 550px;
@@ -1914,6 +2112,13 @@
             <div class="map-container">
                 <div id="tripMap"></div>
             </div>
+            <!-- Timeline below map -->
+            <div class="map-timeline" id="mapTimeline"></div>
+        </div>
+        <!-- Trip detail panel (hidden by default) -->
+        <div class="trip-detail-panel" id="tripDetailPanel">
+            <button class="trip-detail-close" onclick="closeTripDetail()">&times;</button>
+            <div class="trip-detail-content" id="tripDetailContent"></div>
         </div>
     </section>
 
@@ -2340,7 +2545,7 @@
                 // Update map markers if map is already initialized
                 if (map) {
                     addTripMarkers();
-                    renderTimeline();
+                    renderMapTimeline();
                 }
             } catch (error) {
                 console.error('Failed to load trips:', error);
@@ -2973,6 +3178,7 @@
 
                 // Add markers for each trip
                 addTripMarkers();
+                renderMapTimeline();
             } catch (error) {
                 console.error('Error initializing map:', error);
             }
@@ -3058,6 +3264,69 @@
                 }
             }
             return null;
+        }
+
+        // Render timeline below map
+        function renderMapTimeline() {
+            const timeline = document.getElementById('mapTimeline');
+            if (!timeline) return;
+
+            if (trips.length === 0) {
+                timeline.innerHTML = '';
+                return;
+            }
+
+            timeline.innerHTML = trips.map(trip => `
+                <div class="timeline-trip" onclick="showTripDetail(${trip.id})" data-trip-id="${trip.id}">
+                    <div class="timeline-trip-thumb">
+                        <img src="${trip.image}" alt="${trip.title}">
+                    </div>
+                    <div class="timeline-trip-label">${trip.location.split(',')[0]}</div>
+                </div>
+            `).join('');
+        }
+
+        // Show trip detail panel
+        function showTripDetail(tripId) {
+            const trip = trips.find(t => t.id === tripId);
+            if (!trip) return;
+
+            const panel = document.getElementById('tripDetailPanel');
+            const content = document.getElementById('tripDetailContent');
+
+            // Highlight active timeline item
+            document.querySelectorAll('.timeline-trip').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.timeline-trip[data-trip-id="${tripId}"]`)?.classList.add('active');
+
+            // Pan map to trip location
+            const coords = getCoordinates(trip);
+            if (coords && map) {
+                map.setView([coords.lat, coords.lng], 5);
+            }
+
+            content.innerHTML = `
+                <div class="trip-detail-header">
+                    <h3>${trip.title}</h3>
+                    <p>${trip.location} &bull; ${trip.date}</p>
+                </div>
+                <div class="trip-detail-photos">
+                    <div class="trip-detail-photo" onclick="openTripModal(${trip.id})">
+                        <img src="${trip.image}" alt="${trip.title}">
+                    </div>
+                </div>
+                <div class="trip-detail-description">
+                    ${trip.description || 'Click to view full trip details and photos.'}
+                </div>
+                <button class="trip-detail-btn" onclick="openTripModal(${trip.id})">View Full Trip</button>
+            `;
+
+            panel.classList.add('active');
+        }
+
+        // Close trip detail panel
+        function closeTripDetail() {
+            document.getElementById('tripDetailPanel').classList.remove('active');
+            document.querySelectorAll('.timeline-trip').forEach(t => t.classList.remove('active'));
         }
 
         // Initialize
