@@ -439,17 +439,10 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="api.js"></script>
     <script>
-        // Demo credentials
-        const DEMO_USER = {
-            email: 'demo@milestomemories.com',
-            password: 'demo123',
-            name: 'Travel Explorer',
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
-        };
-
         // Check if already logged in
-        if (localStorage.getItem('user')) {
+        if (localStorage.getItem('token')) {
             window.location.href = 'index.html';
         }
 
@@ -466,34 +459,37 @@
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const remember = document.getElementById('rememberMe').checked;
 
-            // Check demo credentials or any registered user
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-            const user = registeredUsers.find(u => u.email === email && u.password === password);
+            try {
+                const response = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
 
-            if ((email === DEMO_USER.email && password === DEMO_USER.password) || user) {
-                const loggedInUser = user || DEMO_USER;
-                localStorage.setItem('user', JSON.stringify({
-                    email: loggedInUser.email,
-                    name: loggedInUser.name,
-                    avatar: loggedInUser.avatar || DEMO_USER.avatar,
-                    isOwner: true
-                }));
-                showToast('Welcome back!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                showToast('Invalid email or password', 'error');
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showToast('Welcome back!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showToast(data.error || 'Invalid email or password', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Connection error. Please try again.', 'error');
             }
         }
 
-        function handleRegister(e) {
+        async function handleRegister(e) {
             e.preventDefault();
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
@@ -516,44 +512,33 @@
                 document.getElementById('confirmError').classList.remove('show');
             }
 
-            // Save user
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+            try {
+                const response = await fetch(API_BASE + '/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
 
-            // Check if email already exists
-            if (registeredUsers.find(u => u.email === email)) {
-                showToast('Email already registered', 'error');
-                return;
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showToast('Account created successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showToast(data.error || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showToast('Connection error. Please try again.', 'error');
             }
-
-            registeredUsers.push({ name, email, password });
-            localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-
-            // Auto login
-            localStorage.setItem('user', JSON.stringify({
-                email,
-                name,
-                avatar: DEMO_USER.avatar,
-                isOwner: true
-            }));
-
-            showToast('Account created successfully!', 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
         }
 
         function socialLogin(provider) {
-            // Simulate social login
-            localStorage.setItem('user', JSON.stringify({
-                email: `user@${provider}.com`,
-                name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
-                avatar: DEMO_USER.avatar,
-                isOwner: true
-            }));
-            showToast(`Signed in with ${provider}!`, 'success');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
+            showToast(`${provider} login coming soon!`, 'error');
         }
 
         function showToast(message, type = '') {
