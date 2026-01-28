@@ -2,7 +2,7 @@
 // Use production URL for the hosted site, localhost for local development
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000/api'
-    : 'http://milestomemories.mooo.com:3000/api';
+    : 'https://milestomemories.mooo.com/api';
 const API_BASE = API_BASE_URL; // Alias for login.html
 
 class MilesToMemoriesAPI {
