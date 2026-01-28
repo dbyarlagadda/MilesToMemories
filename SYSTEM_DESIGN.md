@@ -367,49 +367,89 @@ Capacity: ~100-500 concurrent users
 Bottleneck: Single EC2 instance
 ```
 
-### 7.2 Scaled Architecture (Future)
+### 7.2 Scaled Architecture (Ready to Deploy)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      CloudFront CDN                          │
-│              (Static assets, global distribution)            │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                Application Load Balancer                     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-            ┌─────────────────┼─────────────────┐
-            ▼                 ▼                 ▼
-      ┌──────────┐      ┌──────────┐      ┌──────────┐
-      │   EC2    │      │   EC2    │      │   EC2    │
-      │ (API 1)  │      │ (API 2)  │      │ (API 3)  │
-      └──────────┘      └──────────┘      └──────────┘
-            │                 │                 │
-            └─────────────────┼─────────────────┘
-                              ▼
-                    ┌─────────────────┐
-                    │   Aurora RDS    │
-                    │  (Multi-AZ)     │
-                    └─────────────────┘
-                              │
-                              ▼
-                    ┌─────────────────┐
-                    │   ElastiCache   │
-                    │   (Redis)       │
-                    └─────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    APPLICATION LOAD BALANCER (ALB)                          │
+│                         milestomemories-alb                                  │
+│    ┌─────────────────────────────────────────────────────────────────┐     │
+│    │  Listener :443 (HTTPS)          │  Listener :80 (HTTP→HTTPS)    │     │
+│    │  ┌─────────────────────────┐    │  ┌─────────────────────────┐  │     │
+│    │  │ /api/* → API Target Grp │    │  │ Redirect to HTTPS       │  │     │
+│    │  │ /*     → Static Target  │    │  └─────────────────────────┘  │     │
+│    │  └─────────────────────────┘    │                               │     │
+│    └─────────────────────────────────────────────────────────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AUTO SCALING GROUP                                    │
+│                    Min: 1 │ Desired: 2 │ Max: 4                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
+│  │   EC2 (AZ-1a)   │  │   EC2 (AZ-1b)   │  │   EC2 (AZ-1c)   │   ...       │
+│  │  ┌───────────┐  │  │  ┌───────────┐  │  │  ┌───────────┐  │              │
+│  │  │  Nginx    │  │  │  │  Nginx    │  │  │  │  Nginx    │  │              │
+│  │  │  :80      │  │  │  │  :80      │  │  │  │  :80      │  │              │
+│  │  ├───────────┤  │  │  ├───────────┤  │  │  ├───────────┤  │              │
+│  │  │  Node.js  │  │  │  │  Node.js  │  │  │  │  Node.js  │  │              │
+│  │  │  :3000    │  │  │  │  :3000    │  │  │  │  :3000    │  │              │
+│  │  └───────────┘  │  │  └───────────┘  │  │  └───────────┘  │              │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      AMAZON RDS (Aurora PostgreSQL)                          │
+│                           Multi-AZ Deployment                                │
+│         ┌───────────────────┐         ┌───────────────────┐                 │
+│         │  Primary (R/W)    │ ──────▶ │  Replica (Read)   │                 │
+│         │  us-east-1a       │         │  us-east-1b       │                 │
+│         └───────────────────┘         └───────────────────┘                 │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 7.3 Scaling Strategies
+### 7.3 Auto Scaling Policies
+
+| Policy | Metric | Target | Action |
+|--------|--------|--------|--------|
+| CPU Scaling | ASGAverageCPUUtilization | 70% | Scale out when exceeded |
+| Request Scaling | ALBRequestCountPerTarget | 1000 req/target | Scale out when exceeded |
+| Scale In | Cooldown | 300 seconds | Prevent rapid fluctuation |
+
+### 7.4 CloudFormation Template
+
+A complete infrastructure template is available at `aws-infrastructure.yaml`:
+
+```bash
+# Deploy the stack
+aws cloudformation create-stack \
+  --stack-name MilesToMemories-Infrastructure \
+  --template-body file://aws-infrastructure.yaml \
+  --parameters \
+    ParameterKey=VpcId,ParameterValue=vpc-xxxxx \
+    ParameterKey=SubnetIds,ParameterValue="subnet-aaa,subnet-bbb" \
+    ParameterKey=KeyName,ParameterValue=milestomemories-key \
+    ParameterKey=AMIId,ParameterValue=ami-xxxxx \
+    ParameterKey=CertificateArn,ParameterValue=arn:aws:acm:... \
+  --capabilities CAPABILITY_IAM
+```
+
+### 7.5 Scaling Strategies
 
 | Component | Strategy |
 |-----------|----------|
-| API Servers | Horizontal scaling with ALB |
+| API Servers | Horizontal scaling with ALB + ASG |
 | Database | Aurora read replicas |
-| Static Files | CloudFront CDN |
-| Sessions | Redis/ElastiCache |
-| Images | S3 + CloudFront |
+| Static Files | CloudFront CDN (future) |
+| Sessions | Redis/ElastiCache (future) |
+| Images | S3 + CloudFront (future) |
 
 ---
 
@@ -587,5 +627,5 @@ pm2 restart milestomemories --update-env
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Last Updated: January 28, 2026*
