@@ -441,10 +441,15 @@
 
     <script src="api.js"></script>
     <script>
-        // Check if already logged in
-        if (localStorage.getItem('token')) {
-            window.location.href = 'index.html';
-        }
+        // Prevent redirect loops - only redirect if token exists and is valid
+        (function() {
+            const token = localStorage.getItem('token');
+            if (token && token !== 'undefined' && token !== 'null') {
+                window.location.replace('index.html');
+            }
+        })();
+
+        let isSubmitting = false;
 
         function switchTab(tab) {
             document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
@@ -461,8 +466,20 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            if (isSubmitting) return;
+
+            const submitBtn = e.target.querySelector('.submit-btn');
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
 
             try {
                 const response = await fetch(API_BASE + '/auth/login', {
@@ -473,28 +490,43 @@
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (response.ok && data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     showToast('Welcome back!', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
+                        window.location.replace('index.html');
+                    }, 800);
                 } else {
                     showToast(data.error || 'Invalid email or password', 'error');
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Sign In';
                 }
             } catch (error) {
                 console.error('Login error:', error);
                 showToast('Connection error. Please try again.', 'error');
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
             }
         }
 
         async function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
+            if (isSubmitting) return;
+
+            const submitBtn = e.target.querySelector('.submit-btn');
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate fields
+            if (!name || !email || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
 
             // Validate password
             if (password.length < 6) {
@@ -512,6 +544,10 @@
                 document.getElementById('confirmError').classList.remove('show');
             }
 
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
+
             try {
                 const response = await fetch(API_BASE + '/auth/register', {
                     method: 'POST',
@@ -521,31 +557,39 @@
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (response.ok && data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     showToast('Account created successfully!', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
+                        window.location.replace('index.html');
+                    }, 800);
                 } else {
                     showToast(data.error || 'Registration failed', 'error');
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account';
                 }
             } catch (error) {
                 console.error('Register error:', error);
                 showToast('Connection error. Please try again.', 'error');
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
             }
         }
 
         function socialLogin(provider) {
-            showToast(`${provider} login coming soon!`, 'error');
+            showToast(provider.charAt(0).toUpperCase() + provider.slice(1) + ' login coming soon!', 'error');
         }
 
         function showToast(message, type = '') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast show ' + type;
-            setTimeout(() => toast.className = 'toast', 3000);
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
         }
     </script>
 </body>
