@@ -2521,8 +2521,10 @@
                 renderFeaturedStory();
                 renderGallery();
                 renderDestinations();
-                if (typeof initMap === 'function' && document.getElementById('map')) {
-                    setTimeout(initMap, 100);
+                // Update map markers if map is already initialized
+                if (map) {
+                    addTripMarkers();
+                    renderTimeline();
                 }
             } catch (error) {
                 console.error('Failed to load trips:', error);
@@ -3129,6 +3131,16 @@
         function renderTimeline() {
             const container = document.getElementById('timelineScroll');
             const filteredTrips = getFilteredTrips();
+
+            if (filteredTrips.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #888;">
+                        <p>No trips yet</p>
+                        <p style="font-size: 0.9em;">Add your first trip to see it on the map!</p>
+                    </div>
+                `;
+                return;
+            }
 
             container.innerHTML = filteredTrips.map(trip => `
                 <div class="timeline-item" data-id="${trip.id}" onclick="selectTimelineItem(${trip.id})">
