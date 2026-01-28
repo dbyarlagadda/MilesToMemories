@@ -6,12 +6,25 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#faf8f5">
+    <meta name="description" content="MilesToMemories - Document your travel journeys with photos, maps, and memories">
     <title>MilesToMemories | A Travel Diary</title>
+
+    <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com">
+    <link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
+
+    <!-- Load fonts with display swap for faster text rendering -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Defer Leaflet JS for faster initial render -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <style>
         :root {
             --sky-blue: #a8ccd7;
@@ -2320,6 +2333,46 @@
 
     <script src="api.js"></script>
     <script>
+        // Image optimization utilities
+        function optimizeImageUrl(url, width = 800) {
+            if (!url) return url;
+            // Optimize Unsplash images
+            if (url.includes('unsplash.com')) {
+                // Add WebP format, quality, and size parameters
+                const baseUrl = url.split('?')[0];
+                return `${baseUrl}?w=${width}&q=75&fm=webp&fit=crop&auto=format`;
+            }
+            return url;
+        }
+
+        function getThumbUrl(url, size = 200) {
+            return optimizeImageUrl(url, size);
+        }
+
+        // Lazy loading for images
+        function setupLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                const lazyImages = document.querySelectorAll('img[data-src]');
+                const imageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            imageObserver.unobserve(img);
+                        }
+                    });
+                }, { rootMargin: '50px 0px' });
+
+                lazyImages.forEach(img => imageObserver.observe(img));
+            } else {
+                // Fallback for older browsers
+                document.querySelectorAll('img[data-src]').forEach(img => {
+                    img.src = img.dataset.src;
+                });
+            }
+        }
+
         // Authentication
         let currentUser = null;
 
@@ -2587,7 +2640,7 @@
             grid.innerHTML = trips.slice(0, 3).map((trip, index) => `
                 <article class="story-card" onclick="openTripModal(${trip.id})">
                     <div class="story-card-image">
-                        <img src="${trip.image}" alt="${trip.title}">
+                        <img src="${optimizeImageUrl(trip.image, 600)}" alt="${trip.title}" loading="lazy">
                     </div>
                     <div class="story-card-content">
                         <p class="story-card-location">${trip.location}</p>
@@ -2627,7 +2680,7 @@
             section.style.display = 'block';
             container.innerHTML = `
                 <div class="featured-image" onclick="openTripModal(${featuredTrip.id})">
-                    <img src="${featuredTrip.image}" alt="${featuredTrip.title}">
+                    <img src="${optimizeImageUrl(featuredTrip.image, 1200)}" alt="${featuredTrip.title}" loading="lazy">
                 </div>
                 <div class="featured-content fade-in">
                     <p class="featured-label">Featured Story</p>
@@ -2651,7 +2704,7 @@
             section.style.display = 'block';
             grid.innerHTML = trips.slice(0, 5).map(trip => `
                 <div class="gallery-item" onclick="openTripModal(${trip.id})">
-                    <img src="${trip.image}" alt="${trip.title}">
+                    <img src="${optimizeImageUrl(trip.image, 400)}" alt="${trip.title}" loading="lazy">
                     <div class="gallery-item-overlay">
                         <p class="gallery-item-caption">${trip.title}</p>
                     </div>
@@ -2931,7 +2984,7 @@
             if (destTrips.length > 0) {
                 grid.innerHTML = destTrips.map(trip => `
                     <div class="destination-item" onclick="closeDestinationModal(); setTimeout(() => openTripModal(${trip.id}), 300)">
-                        <img src="${trip.image}" alt="${trip.title}">
+                        <img src="${optimizeImageUrl(trip.image, 400)}" alt="${trip.title}" loading="lazy">
                         <div class="destination-item-overlay">
                             <div class="destination-item-title">${trip.title}</div>
                             <div class="destination-item-date">${trip.date}</div>
@@ -3206,7 +3259,7 @@
                             box-shadow: 0 3px 12px rgba(0,0,0,0.4);
                             cursor: pointer;
                         ">
-                            <img src="${trip.image}" style="width: 100%; height: 100%; object-fit: cover;" alt="${trip.title}">
+                            <img src="${getThumbUrl(trip.image, 88)}" style="width: 100%; height: 100%; object-fit: cover;" alt="${trip.title}">
                         </div>`,
                         iconSize: [44, 44],
                         iconAnchor: [22, 22]
@@ -3216,7 +3269,7 @@
                         .addTo(map)
                         .bindPopup(`
                             <div class="map-marker-popup" style="min-width: 200px;">
-                                <img src="${trip.image}" alt="${trip.title}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                                <img src="${optimizeImageUrl(trip.image, 250)}" alt="${trip.title}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" loading="lazy">
                                 <h4 style="margin: 0 0 5px 0; font-size: 14px;">${trip.title}</h4>
                                 <p style="margin: 0 0 3px 0; font-size: 12px; color: #666;">${trip.location}</p>
                                 <p style="margin: 0 0 10px 0; font-size: 11px; color: #999;">${trip.date}</p>
@@ -3279,7 +3332,7 @@
             timeline.innerHTML = trips.map(trip => `
                 <div class="timeline-trip" onclick="showTripDetail(${trip.id})" data-trip-id="${trip.id}">
                     <div class="timeline-trip-thumb">
-                        <img src="${trip.image}" alt="${trip.title}">
+                        <img src="${getThumbUrl(trip.image, 100)}" alt="${trip.title}" loading="lazy">
                     </div>
                     <div class="timeline-trip-label">${trip.location.split(',')[0]}</div>
                 </div>
@@ -3311,7 +3364,7 @@
                 </div>
                 <div class="trip-detail-photos">
                     <div class="trip-detail-photo" onclick="openTripModal(${trip.id})">
-                        <img src="${trip.image}" alt="${trip.title}">
+                        <img src="${optimizeImageUrl(trip.image, 400)}" alt="${trip.title}" loading="lazy">
                     </div>
                 </div>
                 <div class="trip-detail-description">
