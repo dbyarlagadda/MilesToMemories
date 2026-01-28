@@ -2550,6 +2550,19 @@
         // Render Story Cards
         function renderStories() {
             const grid = document.getElementById('storiesGrid');
+
+            if (trips.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--soft-gray);">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">✈️</div>
+                        <h3 style="margin-bottom: 10px; color: var(--dark-text);">No trips yet</h3>
+                        <p>Start documenting your adventures!</p>
+                        <a href="add-trip.html" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: var(--forest-green); color: white; text-decoration: none; border-radius: 8px;">Add Your First Trip</a>
+                    </div>
+                `;
+                return;
+            }
+
             grid.innerHTML = trips.slice(0, 3).map((trip, index) => `
                 <article class="story-card" onclick="openTripModal(${trip.id})">
                     <div class="story-card-image">
