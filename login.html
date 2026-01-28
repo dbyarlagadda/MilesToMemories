@@ -601,14 +601,20 @@
         // Google Sign-In Configuration
         // Replace with your Google Client ID from Google Cloud Console
         const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        const GOOGLE_CONFIGURED = !GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE');
 
         // Apple Sign-In Configuration
         // Replace with your Apple credentials from Apple Developer Portal
         const APPLE_CLIENT_ID = 'com.milestomemories.app';
         const APPLE_REDIRECT_URI = 'https://milestomemories.mooo.com/login.html';
+        const APPLE_CONFIGURED = false; // Set to true when Apple credentials are configured
 
         // Initialize Google Sign-In
         function initGoogleSignIn() {
+            if (!GOOGLE_CONFIGURED) {
+                console.log('Google Sign-In not configured');
+                return;
+            }
             if (typeof google !== 'undefined' && google.accounts) {
                 google.accounts.id.initialize({
                     client_id: GOOGLE_CLIENT_ID,
@@ -620,10 +626,13 @@
 
         // Google Sign-In button click
         function signInWithGoogle() {
+            if (!GOOGLE_CONFIGURED) {
+                showToast('Google Sign-In is not configured yet. Please use email login.', 'error');
+                return;
+            }
             if (typeof google !== 'undefined' && google.accounts) {
                 google.accounts.id.prompt((notification) => {
                     if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        // Fallback: show One Tap or redirect
                         showToast('Please allow popups for Google Sign-In', 'error');
                     }
                 });
@@ -678,6 +687,10 @@
 
         // Apple Sign-In
         function signInWithApple() {
+            if (!APPLE_CONFIGURED) {
+                showToast('Apple Sign-In is not configured yet. Please use email login.', 'error');
+                return;
+            }
             if (typeof AppleID !== 'undefined') {
                 AppleID.auth.init({
                     clientId: APPLE_CLIENT_ID,
