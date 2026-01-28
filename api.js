@@ -1,5 +1,6 @@
 // MilesToMemories API Client
 const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL.replace('/api', '') + '/api'; // Alias for login.html
 
 class MilesToMemoriesAPI {
     constructor() {

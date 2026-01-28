@@ -2324,6 +2324,7 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <script src="api.js"></script>
     <script>
         // Authentication
         let currentUser = null;
@@ -2488,133 +2489,49 @@
             }
         };
 
-        // Trip Data
-        const trips = [
-            {
-                id: 0,
-                title: 'Whispers of Ancient Temples',
-                location: 'Kyoto, Japan',
-                date: 'November 2024',
-                image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80',
-                description: 'Walking through the vermillion gates of Fushimi Inari at dawn, with mist weaving through thousands of torii gates. Kyoto taught me that beauty lives in the quiet moments—in the rustle of bamboo, the precision of a tea ceremony, and the gentle bow of a stranger.',
-                mood: 'peaceful',
-                likes: 847,
-                liked: false,
-                saved: false,
-                comments: [
-                    { author: 'Sarah', text: 'This is absolutely stunning! How long did you spend in Kyoto?', time: '2 days ago', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
-                    { author: 'Mike', text: 'The temples look magical in the mist!', time: '1 day ago', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop' }
-                ]
-            },
-            {
-                id: 1,
-                title: 'Lemon Groves & Coastal Dreams',
-                location: 'Amalfi Coast, Italy',
-                date: 'September 2024',
-                image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&q=80',
-                description: 'The scent of lemons and sea salt filled every breath. Winding roads carved into cliffs revealed villages painted in sunset colors. Each evening ended with limoncello on terraces overlooking the endless blue.',
-                mood: 'relaxed',
-                likes: 1203,
-                liked: false,
-                saved: false,
-                comments: [
-                    { author: 'Emma', text: 'Italy is always a good idea! ❤️', time: '3 days ago', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' }
-                ]
-            },
-            {
-                id: 2,
-                title: 'Above the Clouds',
-                location: 'Swiss Alps',
-                date: 'July 2024',
-                image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80',
-                description: 'At 3,000 meters, the world below disappeared into a sea of clouds. The silence was profound—just the crunch of snow underfoot and the distant echo of cowbells. Switzerland reminded me why we climb.',
-                mood: 'adventurous',
-                likes: 2156,
-                liked: false,
-                saved: false,
-                comments: []
-            },
-            {
-                id: 3,
-                title: 'Land of Fire and Ice',
-                location: 'Iceland',
-                date: 'March 2024',
-                image: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&q=80',
-                description: 'Iceland defied every expectation. In two weeks, I witnessed waterfalls that thundered with the force of ancient gods, drove through landscapes that felt borrowed from another planet, and stood beneath the dancing aurora as green light painted the winter sky. This is the story of finding silence in a world that never stops moving.',
-                mood: 'adventurous',
-                likes: 3421,
-                liked: false,
-                saved: false,
-                comments: [
-                    { author: 'Alex', text: 'Did you see the Northern Lights? That\'s my dream!', time: '1 week ago', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' }
-                ]
-            },
-            {
-                id: 4,
-                title: 'Morning Stillness',
-                location: 'Lake Bled, Slovenia',
-                date: 'June 2024',
-                image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80',
-                description: 'I woke at 5am to catch the lake in perfect stillness. The island church reflected like a mirror painting. Some moments are worth losing sleep for.',
-                mood: 'peaceful',
-                likes: 1567,
-                liked: false,
-                saved: false,
-                comments: []
-            },
-            {
-                id: 5,
-                title: 'Colors of the Medina',
-                location: 'Marrakech, Morocco',
-                date: 'April 2024',
-                image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800&q=80',
-                description: 'Lost in the maze of the medina, every turn revealed new colors, scents, and sounds. The chaos was intoxicating, the hospitality overwhelming.',
-                mood: 'excited',
-                likes: 982,
-                liked: false,
-                saved: false,
-                comments: []
-            },
-            {
-                id: 6,
-                title: 'Hidden Waterfall',
-                location: 'Costa Rica',
-                date: 'February 2024',
-                image: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800&q=80',
-                description: 'After a 3-hour jungle trek, we found this hidden paradise. The water was cold and perfect. Nature rewards those who seek.',
-                mood: 'adventurous',
-                likes: 1834,
-                liked: false,
-                saved: false,
-                comments: []
-            },
-            {
-                id: 7,
-                title: 'Fjord Dreams',
-                location: 'Norway',
-                date: 'August 2024',
-                image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80',
-                description: 'Sailing through the fjords felt like entering another world. Towering cliffs, cascading waterfalls, and water so clear you could see straight down.',
-                mood: 'peaceful',
-                likes: 2089,
-                liked: false,
-                saved: false,
-                comments: []
-            },
-            {
-                id: 8,
-                title: 'Misty Morning',
-                location: 'Pacific Northwest',
-                date: 'October 2024',
-                image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-                description: 'When the fog rolled in, the forest transformed. Every tree became a silhouette, every sound muffled. Pure magic.',
-                mood: 'nostalgic',
-                likes: 756,
-                liked: false,
-                saved: false,
-                comments: []
+        // Trip Data - loaded from API
+        let trips = [];
+
+        // Load trips from API
+        async function loadTripsFromAPI() {
+            try {
+                const response = await fetch(API_BASE + '/trips');
+                const data = await response.json();
+
+                // Transform API data to match frontend format
+                trips = data.map(trip => ({
+                    id: trip.id,
+                    title: trip.title,
+                    location: trip.location,
+                    date: trip.date || '',
+                    image: trip.image_url,
+                    description: trip.description || '',
+                    mood: trip.mood || 'peaceful',
+                    likes: parseInt(trip.likes_count) || 0,
+                    liked: trip.liked || false,
+                    saved: trip.saved || false,
+                    comments: [],
+                    latitude: trip.latitude,
+                    longitude: trip.longitude,
+                    author_name: trip.author_name,
+                    author_avatar: trip.author_avatar,
+                    user_id: trip.user_id
+                }));
+
+                // Re-render everything with new data
+                renderStories();
+                renderDestinations();
+                if (typeof initMap === 'function' && document.getElementById('map')) {
+                    setTimeout(initMap, 100);
+                }
+            } catch (error) {
+                console.error('Failed to load trips:', error);
+                // Show empty state if API fails
+                trips = [];
+                renderStories();
+                renderDestinations();
             }
-        ];
+        }
 
         let currentTrip = null;
 
@@ -3226,9 +3143,7 @@
 
         // Initialize
         checkAuth();
-        loadTripsFromStorage();
-        renderStories();
-        renderDestinations();
+        loadTripsFromAPI(); // Load trips from database API
 
         // Initialize map after DOM is ready
         setTimeout(initMap, 100);
