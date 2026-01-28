@@ -2492,10 +2492,33 @@
         // Trip Data - loaded from API
         let trips = [];
 
-        // Load trips from API
+        // Load trips from API - only user's own trips
         async function loadTripsFromAPI() {
             try {
-                const response = await fetch(API_BASE + '/trips');
+                const token = localStorage.getItem('token');
+
+                // If not logged in, show empty state
+                if (!token) {
+                    trips = [];
+                    renderStories();
+                    renderDestinations();
+                    return;
+                }
+
+                // Fetch only the logged-in user's trips
+                const response = await fetch(API_BASE + '/users/trips', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (!response.ok) {
+                    trips = [];
+                    renderStories();
+                    renderDestinations();
+                    return;
+                }
+
                 const data = await response.json();
 
                 // Transform API data to match frontend format
@@ -2513,8 +2536,6 @@
                     comments: [],
                     latitude: trip.latitude,
                     longitude: trip.longitude,
-                    author_name: trip.author_name,
-                    author_avatar: trip.author_avatar,
                     user_id: trip.user_id
                 }));
 
