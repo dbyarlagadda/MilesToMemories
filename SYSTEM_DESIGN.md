@@ -379,7 +379,94 @@ Bottleneck: Single EC2 instance
 
 ---
 
-## 8. Monitoring & Logging
+## 8. Performance Optimizations
+
+### 8.1 Image Optimization
+
+**WebP Format Conversion:**
+```javascript
+// Automatically converts Unsplash images to WebP with quality optimization
+function optimizeImageUrl(url, width = 800) {
+    if (url.includes('unsplash.com')) {
+        const baseUrl = url.split('?')[0];
+        return `${baseUrl}?w=${width}&q=75&fm=webp&fit=crop&auto=format`;
+    }
+    return url;
+}
+```
+
+**Image Size Strategy:**
+| Context | Width | Purpose |
+|---------|-------|---------|
+| Map markers | 88px | Tiny circular icons |
+| Popup images | 250px | Small preview in map popup |
+| Gallery/Timeline | 400px | Medium thumbnails |
+| Story cards | 600px | Card images |
+| Featured story | 1200px | Hero images |
+
+### 8.2 Lazy Loading
+
+**Native Lazy Loading:**
+```html
+<img src="..." loading="lazy" alt="...">
+```
+
+**Intersection Observer (Custom):**
+```javascript
+function setupLazyLoading() {
+    if ('IntersectionObserver' in window) {
+        const lazyImages = document.querySelectorAll('img[data-src]');
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    imageObserver.unobserve(img);
+                }
+            });
+        }, { rootMargin: '50px 0px' });
+        lazyImages.forEach(img => imageObserver.observe(img));
+    }
+}
+```
+
+### 8.3 Resource Hints
+
+**Preconnect (Early Connection):**
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="preconnect" href="https://unpkg.com">
+```
+
+**DNS Prefetch (CDN Tiles):**
+```html
+<link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com">
+<link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
+```
+
+### 8.4 Script Loading
+
+**Deferred JavaScript:**
+```html
+<!-- Non-critical scripts load after HTML parsing -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+```
+
+### 8.5 Performance Metrics
+
+| Optimization | Impact |
+|--------------|--------|
+| WebP images | ~30% smaller file size |
+| Lazy loading | Faster initial page load |
+| Preconnect | ~100-300ms faster resource fetch |
+| Deferred scripts | Unblocked HTML parsing |
+
+---
+
+## 9. Monitoring & Logging
 
 ### 8.1 Current Setup
 
@@ -395,9 +482,9 @@ Bottleneck: Single EC2 instance
 
 ---
 
-## 9. Deployment
+## 10. Deployment
 
-### 9.1 Current Deployment Process
+### 10.1 Current Deployment Process
 
 ```bash
 # 1. Push to GitHub
@@ -412,7 +499,7 @@ git pull origin main
 pm2 restart milestomemories --update-env
 ```
 
-### 9.2 Recommended CI/CD Pipeline
+### 10.2 Recommended CI/CD Pipeline
 
 ```
 ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
@@ -423,7 +510,7 @@ pm2 restart milestomemories --update-env
 
 ---
 
-## 10. Cost Analysis (AWS Free Tier)
+## 11. Cost Analysis (AWS Free Tier)
 
 | Service | Free Tier Limit | Current Usage |
 |---------|-----------------|---------------|
@@ -436,7 +523,7 @@ pm2 restart milestomemories --update-env
 
 ---
 
-## 11. Tech Stack Summary
+## 12. Tech Stack Summary
 
 | Layer | Technology |
 |-------|------------|
@@ -453,7 +540,7 @@ pm2 restart milestomemories --update-env
 
 ---
 
-## 12. Future Enhancements
+## 13. Future Enhancements
 
 1. **Image Storage:** Migrate to S3 for scalable image hosting
 2. **Search:** Add Elasticsearch for trip/location search
@@ -466,5 +553,5 @@ pm2 restart milestomemories --update-env
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: January 2026*
+*Document Version: 1.1*
+*Last Updated: January 28, 2026*
