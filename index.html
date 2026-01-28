@@ -2070,18 +2070,10 @@
         <div class="stories-grid" id="storiesGrid"></div>
     </section>
 
-    <!-- Featured Story -->
-    <section class="featured">
-        <div class="featured-container">
-            <div class="featured-image" onclick="openTripModal(3)">
-                <img src="https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=1000&q=80" alt="Iceland">
-            </div>
-            <div class="featured-content fade-in">
-                <p class="featured-label">Featured Story</p>
-                <h2>Land of Fire and Ice</h2>
-                <p class="featured-excerpt">Iceland defied every expectation. I witnessed waterfalls that thundered with the force of ancient gods and stood beneath the dancing aurora.</p>
-                <span class="read-more" onclick="openTripModal(3)">Read the full story</span>
-            </div>
+    <!-- Featured Story - Dynamic -->
+    <section class="featured" id="featuredSection" style="display: none;">
+        <div class="featured-container" id="featuredContainer">
+            <!-- Rendered dynamically -->
         </div>
     </section>
 
@@ -2109,33 +2101,14 @@
         </div>
     </section>
 
-    <!-- Gallery -->
-    <section class="section" id="gallery">
+    <!-- Gallery - Dynamic -->
+    <section class="section" id="gallery" style="display: none;">
         <div class="section-header fade-in">
             <p class="section-label">Visual Journal</p>
             <h2>Captured Moments</h2>
         </div>
-        <div class="gallery-grid">
-            <div class="gallery-item" onclick="openTripModal(4)">
-                <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80" alt="Lake Bled">
-                <div class="gallery-item-overlay"><p class="gallery-item-caption">Morning stillness, Lake Bled</p></div>
-            </div>
-            <div class="gallery-item" onclick="openTripModal(5)">
-                <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&q=80" alt="Marrakech">
-                <div class="gallery-item-overlay"><p class="gallery-item-caption">Colors of Marrakech</p></div>
-            </div>
-            <div class="gallery-item" onclick="openTripModal(6)">
-                <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400&q=80" alt="Waterfall">
-                <div class="gallery-item-overlay"><p class="gallery-item-caption">Hidden falls, Costa Rica</p></div>
-            </div>
-            <div class="gallery-item" onclick="openTripModal(7)">
-                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80" alt="Norway">
-                <div class="gallery-item-overlay"><p class="gallery-item-caption">Norwegian fjords</p></div>
-            </div>
-            <div class="gallery-item" onclick="openTripModal(8)">
-                <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80" alt="Mountains">
-                <div class="gallery-item-overlay"><p class="gallery-item-caption">Misty morning</p></div>
-            </div>
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Rendered dynamically -->
         </div>
     </section>
 
@@ -2501,6 +2474,8 @@
                 if (!token) {
                     trips = [];
                     renderStories();
+                    renderFeaturedStory();
+                    renderGallery();
                     renderDestinations();
                     return;
                 }
@@ -2515,6 +2490,8 @@
                 if (!response.ok) {
                     trips = [];
                     renderStories();
+                    renderFeaturedStory();
+                    renderGallery();
                     renderDestinations();
                     return;
                 }
@@ -2541,6 +2518,8 @@
 
                 // Re-render everything with new data
                 renderStories();
+                renderFeaturedStory();
+                renderGallery();
                 renderDestinations();
                 if (typeof initMap === 'function' && document.getElementById('map')) {
                     setTimeout(initMap, 100);
@@ -2550,6 +2529,8 @@
                 // Show empty state if API fails
                 trips = [];
                 renderStories();
+                renderFeaturedStory();
+                renderGallery();
                 renderDestinations();
             }
         }
@@ -2592,6 +2573,54 @@
                     setTimeout(() => card.classList.add('visible'), i * 100);
                 });
             }, 300);
+        }
+
+        // Render Featured Story - shows most liked trip
+        function renderFeaturedStory() {
+            const section = document.getElementById('featuredSection');
+            const container = document.getElementById('featuredContainer');
+
+            if (trips.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            // Get the trip with most likes (or first trip if no likes)
+            const featuredTrip = trips.reduce((max, trip) => trip.likes > max.likes ? trip : max, trips[0]);
+
+            section.style.display = 'block';
+            container.innerHTML = `
+                <div class="featured-image" onclick="openTripModal(${featuredTrip.id})">
+                    <img src="${featuredTrip.image}" alt="${featuredTrip.title}">
+                </div>
+                <div class="featured-content fade-in">
+                    <p class="featured-label">Featured Story</p>
+                    <h2>${featuredTrip.title}</h2>
+                    <p class="featured-excerpt">${featuredTrip.description.substring(0, 150)}${featuredTrip.description.length > 150 ? '...' : ''}</p>
+                    <span class="read-more" onclick="openTripModal(${featuredTrip.id})">Read the full story</span>
+                </div>
+            `;
+        }
+
+        // Render Gallery - shows all trips as gallery items
+        function renderGallery() {
+            const section = document.getElementById('gallery');
+            const grid = document.getElementById('galleryGrid');
+
+            if (trips.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            grid.innerHTML = trips.slice(0, 5).map(trip => `
+                <div class="gallery-item" onclick="openTripModal(${trip.id})">
+                    <img src="${trip.image}" alt="${trip.title}">
+                    <div class="gallery-item-overlay">
+                        <p class="gallery-item-caption">${trip.title}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // Open Trip Modal
