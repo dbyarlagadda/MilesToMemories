@@ -2876,15 +2876,69 @@
 
         // Trip coordinates for map
         const tripCoordinates = {
+            // Asia
             'Kyoto, Japan': { lat: 35.0116, lng: 135.7681 },
+            'Tokyo': { lat: 35.6762, lng: 139.6503 },
+            'Japan': { lat: 36.2048, lng: 138.2529 },
+            'Bali': { lat: -8.4095, lng: 115.1889 },
+            'Indonesia': { lat: -0.7893, lng: 113.9213 },
+            'Thailand': { lat: 15.8700, lng: 100.9925 },
+            'Bangkok': { lat: 13.7563, lng: 100.5018 },
+            'Vietnam': { lat: 14.0583, lng: 108.2772 },
+            'India': { lat: 20.5937, lng: 78.9629 },
+            'China': { lat: 35.8617, lng: 104.1954 },
+            'Singapore': { lat: 1.3521, lng: 103.8198 },
+            // Europe
             'Amalfi Coast, Italy': { lat: 40.6333, lng: 14.6029 },
             'Swiss Alps': { lat: 46.8182, lng: 8.2275 },
+            'Switzerland': { lat: 46.8182, lng: 8.2275 },
             'Iceland': { lat: 64.9631, lng: -19.0208 },
             'Lake Bled, Slovenia': { lat: 46.3625, lng: 14.0936 },
-            'Marrakech, Morocco': { lat: 31.6295, lng: -7.9811 },
-            'Costa Rica': { lat: 9.7489, lng: -83.7534 },
             'Norway': { lat: 60.4720, lng: 8.4689 },
-            'Pacific Northwest, USA': { lat: 47.6062, lng: -122.3321 }
+            'Paris': { lat: 48.8566, lng: 2.3522 },
+            'France': { lat: 46.2276, lng: 2.2137 },
+            'Italy': { lat: 41.8719, lng: 12.5674 },
+            'Rome': { lat: 41.9028, lng: 12.4964 },
+            'Spain': { lat: 40.4637, lng: -3.7492 },
+            'Barcelona': { lat: 41.3851, lng: 2.1734 },
+            'Greece': { lat: 39.0742, lng: 21.8243 },
+            'Santorini': { lat: 36.3932, lng: 25.4615 },
+            'Portugal': { lat: 39.3999, lng: -8.2245 },
+            'London': { lat: 51.5074, lng: -0.1278 },
+            'UK': { lat: 55.3781, lng: -3.4360 },
+            'Germany': { lat: 51.1657, lng: 10.4515 },
+            'Amsterdam': { lat: 52.3676, lng: 4.9041 },
+            'Netherlands': { lat: 52.1326, lng: 5.2913 },
+            // Americas
+            'Pacific Northwest, USA': { lat: 47.6062, lng: -122.3321 },
+            'Costa Rica': { lat: 9.7489, lng: -83.7534 },
+            'New York': { lat: 40.7128, lng: -74.0060 },
+            'California': { lat: 36.7783, lng: -119.4179 },
+            'Los Angeles': { lat: 34.0522, lng: -118.2437 },
+            'San Francisco': { lat: 37.7749, lng: -122.4194 },
+            'Hawaii': { lat: 19.8968, lng: -155.5828 },
+            'Miami': { lat: 25.7617, lng: -80.1918 },
+            'Florida': { lat: 27.6648, lng: -81.5158 },
+            'Texas': { lat: 31.9686, lng: -99.9018 },
+            'Mexico': { lat: 23.6345, lng: -102.5528 },
+            'Cancun': { lat: 21.1619, lng: -86.8515 },
+            'Canada': { lat: 56.1304, lng: -106.3468 },
+            'Brazil': { lat: -14.2350, lng: -51.9253 },
+            'Peru': { lat: -9.1900, lng: -75.0152 },
+            'Argentina': { lat: -38.4161, lng: -63.6167 },
+            // Africa & Middle East
+            'Marrakech, Morocco': { lat: 31.6295, lng: -7.9811 },
+            'Morocco': { lat: 31.7917, lng: -7.0926 },
+            'Egypt': { lat: 26.8206, lng: 30.8025 },
+            'South Africa': { lat: -30.5595, lng: 22.9375 },
+            'Dubai': { lat: 25.2048, lng: 55.2708 },
+            'UAE': { lat: 23.4241, lng: 53.8478 },
+            // Oceania
+            'Australia': { lat: -25.2744, lng: 133.7751 },
+            'Sydney': { lat: -33.8688, lng: 151.2093 },
+            'New Zealand': { lat: -40.9006, lng: 174.8860 },
+            'Fiji': { lat: -17.7134, lng: 178.0650 },
+            'Maldives': { lat: 3.2028, lng: 73.2207 }
         };
 
         let map = null;
@@ -2932,7 +2986,7 @@
             const bounds = [];
 
             trips.forEach((trip) => {
-                const coords = getCoordinates(trip.location);
+                const coords = getCoordinates(trip);
                 if (coords) {
                     // Create a small circular photo icon
                     const customIcon = L.divIcon({
@@ -2984,14 +3038,22 @@
             }
         }
 
-        function getCoordinates(location) {
+        function getCoordinates(trip) {
+            // Use trip's own coordinates if available
+            if (trip.latitude && trip.longitude) {
+                return { lat: parseFloat(trip.latitude), lng: parseFloat(trip.longitude) };
+            }
+
+            const location = trip.location;
+
             // Check exact match first
             if (tripCoordinates[location]) {
                 return tripCoordinates[location];
             }
             // Check partial match
             for (const key in tripCoordinates) {
-                if (location.includes(key) || key.includes(location.split(',')[0])) {
+                if (location.toLowerCase().includes(key.toLowerCase()) ||
+                    key.toLowerCase().includes(location.split(',')[0].toLowerCase())) {
                     return tripCoordinates[key];
                 }
             }
