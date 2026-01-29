@@ -68,6 +68,105 @@ router.get('/', optionalAuth, async (req, res) => {
     }
 });
 
+// Get featured trips (must be before /:id)
+router.get('/featured', optionalAuth, async (req, res) => {
+    try {
+        const result = await db.query(
+            `SELECT t.*, u.name as author_name, u.avatar_url as author_avatar,
+                    (SELECT COUNT(*) FROM trip_likes WHERE trip_id = t.id) as likes_count
+             FROM trips t
+             JOIN users u ON t.user_id = u.id
+             WHERE t.is_public = true OR t.is_public IS NULL
+             ORDER BY likes_count DESC, t.created_at DESC
+             LIMIT 5`
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Get featured trips error:', error);
+        res.status(500).json({ error: 'Failed to get featured trips' });
+    }
+});
+
+// Get "On This Day" memories (must be before /:id)
+router.get('/on-this-day', authenticateToken, async (req, res) => {
+    try {
+        const today = new Date();
+        const month = today.toLocaleString('en-US', { month: 'long' });
+
+        const result = await db.query(
+            `SELECT t.*,
+                    EXTRACT(YEAR FROM t.created_at) as trip_year,
+                    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM t.created_at) as years_ago
+             FROM trips t
+             WHERE t.user_id = $1
+             AND t.date ILIKE $2
+             ORDER BY t.created_at DESC`,
+            [req.user.id, `%${month}%`]
+        );
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Get on-this-day error:', error);
+        res.status(500).json({ error: 'Failed to get memories' });
+    }
+});
+
+// Get yearly recap (must be before /:id)
+router.get('/yearly-recap/:year', authenticateToken, async (req, res) => {
+    try {
+        const { year } = req.params;
+
+        const tripsResult = await db.query(
+            `SELECT COUNT(*) as total_trips,
+                    COUNT(DISTINCT location) as unique_destinations
+             FROM trips
+             WHERE user_id = $1 AND date ILIKE $2`,
+            [req.user.id, `%${year}%`]
+        );
+
+        const topDestinations = await db.query(
+            `SELECT location, COUNT(*) as visit_count
+             FROM trips
+             WHERE user_id = $1 AND date ILIKE $2
+             GROUP BY location
+             ORDER BY visit_count DESC
+             LIMIT 5`,
+            [req.user.id, `%${year}%`]
+        );
+
+        const moodBreakdown = await db.query(
+            `SELECT mood, COUNT(*) as count
+             FROM trips
+             WHERE user_id = $1 AND date ILIKE $2
+             GROUP BY mood`,
+            [req.user.id, `%${year}%`]
+        );
+
+        res.json({
+            year: year,
+            total_trips: parseInt(tripsResult.rows[0]?.total_trips) || 0,
+            unique_destinations: parseInt(tripsResult.rows[0]?.unique_destinations) || 0,
+            top_destinations: topDestinations.rows,
+            mood_breakdown: moodBreakdown.rows
+        });
+    } catch (error) {
+        console.error('Get yearly recap error:', error);
+        res.status(500).json({ error: 'Failed to get yearly recap' });
+    }
+});
+
+// Get all available tags (must be before /:id)
+router.get('/tags', async (req, res) => {
+    try {
+        const result = await db.query(
+            `SELECT DISTINCT unnest(tags) as tag FROM trips WHERE tags IS NOT NULL`
+        );
+        res.json(result.rows.map(r => r.tag));
+    } catch (error) {
+        res.json(['beach', 'mountain', 'city', 'food', 'adventure', 'culture', 'nature', 'romantic']);
+    }
+});
+
 // Get single trip
 router.get('/:id', optionalAuth, async (req, res) => {
     try {
