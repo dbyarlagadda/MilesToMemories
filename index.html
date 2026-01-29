@@ -9,6 +9,10 @@
     <meta name="description" content="MilesToMemories - Document your travel journeys with photos, maps, and memories">
     <title>MilesToMemories | A Travel Diary</title>
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%234a6741' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>M</text></svg>">
+
     <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,6 +110,350 @@
             font-size: 1rem;
             max-width: 65ch;
             color: var(--soft-gray);
+        }
+
+        /* Search & Filters */
+        .search-section {
+            padding: var(--spacing-lg) var(--spacing-md);
+            background: var(--white);
+            position: sticky;
+            top: calc(var(--nav-height) + var(--safe-top));
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            background: var(--sandy-beige-light);
+            border-radius: 30px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--forest-green);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 14px 20px;
+            background: var(--forest-green);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background: var(--dark-text);
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: var(--sandy-beige-light);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .filter-toggle:hover {
+            background: var(--sandy-beige);
+        }
+
+        .filters-panel {
+            max-width: 800px;
+            margin: var(--spacing-md) auto 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--soft-gray);
+        }
+
+        .filter-group select {
+            padding: 10px 15px;
+            border: 1px solid var(--sandy-beige);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .clear-filters {
+            padding: 10px 15px;
+            background: none;
+            border: 1px solid var(--sandy-beige);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--soft-gray);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-filters:hover {
+            border-color: var(--error-red, #d64545);
+            color: var(--error-red, #d64545);
+        }
+
+        .tag-pills {
+            max-width: 800px;
+            margin: var(--spacing-md) auto 0;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .tag-pills::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tag-pill {
+            padding: 8px 16px;
+            background: var(--sandy-beige-light);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-pill:hover {
+            background: var(--sandy-beige);
+        }
+
+        .tag-pill.active {
+            background: var(--forest-green);
+            color: white;
+        }
+
+        /* On This Day Section */
+        .on-this-day-section {
+            padding: var(--spacing-xl) var(--spacing-md);
+            background: linear-gradient(135deg, #fff9e6 0%, #fff5d6 100%);
+        }
+
+        .on-this-day-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .memory-card {
+            flex: 0 0 280px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .memory-card-image {
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .memory-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .memory-card-content {
+            padding: 15px;
+        }
+
+        .memory-card-years {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--forest-green);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .memory-card h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .memory-card p {
+            font-size: 0.85rem;
+            color: var(--soft-gray);
+        }
+
+        /* Reactions */
+        .reactions-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .reaction-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--sandy-beige-light);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reaction-btn:hover {
+            background: var(--sandy-beige);
+            transform: scale(1.05);
+        }
+
+        .reaction-btn.active {
+            background: var(--sky-blue-light);
+        }
+
+        .reaction-btn .count {
+            color: var(--soft-gray);
+            font-size: 0.8rem;
+        }
+
+        /* Privacy Badge */
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--sandy-beige-light);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--soft-gray);
+        }
+
+        .privacy-badge.private {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Photo Grid Layout */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .photo-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .photo-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .photo-card:hover .photo-card-overlay {
+            opacity: 1;
+        }
+
+        /* Yearly Recap */
+        .recap-section {
+            padding: var(--spacing-xl) var(--spacing-md);
+            background: linear-gradient(135deg, var(--forest-green) 0%, #3d5636 100%);
+            color: white;
+        }
+
+        .recap-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            max-width: 600px;
+            margin: var(--spacing-lg) auto;
+        }
+
+        .recap-stat {
+            text-align: center;
+        }
+
+        .recap-stat-number {
+            font-size: 2.5rem;
+            font-weight: 600;
+            font-family: var(--font-serif);
+        }
+
+        .recap-stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
         }
 
         /* Navigation */
@@ -2099,6 +2447,85 @@
         <p>This is not just about destinations. It's about the conversations with strangers who became friends.</p>
     </section>
 
+    <!-- Search & Filters - HIDDEN FOR NOW
+    <section class="search-section" id="searchSection">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search trips by location, title, or keyword..." autocomplete="off">
+                <button class="search-btn" onclick="performSearch()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="filter-toggles">
+                <button class="filter-toggle" onclick="toggleFilters()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" y1="21" x2="4" y2="14"></line>
+                        <line x1="4" y1="10" x2="4" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12" y2="3"></line>
+                        <line x1="20" y1="21" x2="20" y2="16"></line>
+                        <line x1="20" y1="12" x2="20" y2="3"></line>
+                    </svg>
+                    Filters
+                </button>
+            </div>
+        </div>
+        <div class="filters-panel" id="filtersPanel" style="display: none;">
+            <div class="filter-group">
+                <label>Country</label>
+                <select id="filterCountry" onchange="applyFilters()">
+                    <option value="">All Countries</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="filterYear" onchange="applyFilters()">
+                    <option value="">All Years</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                </select>
+            </div>
+            <button class="clear-filters" onclick="clearFilters()">Clear All</button>
+        </div>
+        <div class="tag-pills" id="tagPills">
+            <button class="tag-pill active" data-tag="" onclick="filterByTag('')">All</button>
+            <button class="tag-pill" data-tag="beach" onclick="filterByTag('beach')">🏖️ Beach</button>
+            <button class="tag-pill" data-tag="mountain" onclick="filterByTag('mountain')">⛰️ Mountain</button>
+            <button class="tag-pill" data-tag="city" onclick="filterByTag('city')">🏙️ City</button>
+            <button class="tag-pill" data-tag="food" onclick="filterByTag('food')">🍜 Food</button>
+            <button class="tag-pill" data-tag="adventure" onclick="filterByTag('adventure')">🎒 Adventure</button>
+            <button class="tag-pill" data-tag="culture" onclick="filterByTag('culture')">🏛️ Culture</button>
+            <button class="tag-pill" data-tag="nature" onclick="filterByTag('nature')">🌿 Nature</button>
+            <button class="tag-pill" data-tag="romantic" onclick="filterByTag('romantic')">💕 Romantic</button>
+        </div>
+    </section>
+    END HIDDEN SEARCH SECTION -->
+
+    <!-- Hidden dummy elements for JS compatibility -->
+    <div style="display:none;">
+        <input type="text" id="searchInput">
+        <select id="filterCountry"></select>
+        <select id="filterYear"></select>
+        <div id="filtersPanel"></div>
+        <div id="tagPills"><button class="tag-pill" data-tag=""></button></div>
+    </div>
+
+    <!-- On This Day Memories -->
+    <section class="on-this-day-section" id="onThisDaySection" style="display: none;">
+        <div class="section-header fade-in">
+            <p class="section-label">Memory Lane</p>
+            <h2>📅 On This Day</h2>
+        </div>
+        <div class="on-this-day-grid" id="onThisDayGrid">
+            <!-- Rendered dynamically -->
+        </div>
+    </section>
+
     <!-- Stories -->
     <section class="section stories" id="stories">
         <div class="section-header">
@@ -2587,7 +3014,11 @@
                     comments: [],
                     latitude: trip.latitude,
                     longitude: trip.longitude,
-                    user_id: trip.user_id
+                    user_id: trip.user_id,
+                    tags: trip.tags || [],
+                    is_public: trip.is_public !== false,
+                    country: trip.country || '',
+                    city: trip.city || ''
                 }));
 
                 // Re-render everything with new data
@@ -3380,6 +3811,299 @@
         function closeTripDetail() {
             document.getElementById('tripDetailPanel').classList.remove('active');
             document.querySelectorAll('.timeline-trip').forEach(t => t.classList.remove('active'));
+        }
+
+        // ======== SEARCH & FILTER FUNCTIONALITY ========
+        let currentFilters = {
+            search: '',
+            country: '',
+            year: '',
+            tag: ''
+        };
+
+        // Perform search
+        function performSearch() {
+            currentFilters.search = document.getElementById('searchInput').value.trim().toLowerCase();
+            applyAllFilters();
+        }
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Toggle filters panel
+        function toggleFilters() {
+            const panel = document.getElementById('filtersPanel');
+            const isVisible = panel.style.display !== 'none';
+            panel.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Apply filter from dropdowns
+        function applyFilters() {
+            currentFilters.country = document.getElementById('filterCountry').value;
+            currentFilters.year = document.getElementById('filterYear').value;
+            applyAllFilters();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterCountry').value = '';
+            document.getElementById('filterYear').value = '';
+            document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector('.tag-pill[data-tag=""]').classList.add('active');
+            currentFilters = { search: '', country: '', year: '', tag: '' };
+            applyAllFilters();
+        }
+
+        // Filter by tag
+        function filterByTag(tag) {
+            currentFilters.tag = tag;
+            document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`.tag-pill[data-tag="${tag}"]`).classList.add('active');
+            applyAllFilters();
+        }
+
+        // Apply all filters and update UI
+        function applyAllFilters() {
+            let filteredTrips = [...trips];
+
+            // Search filter
+            if (currentFilters.search) {
+                filteredTrips = filteredTrips.filter(trip =>
+                    trip.title.toLowerCase().includes(currentFilters.search) ||
+                    trip.location.toLowerCase().includes(currentFilters.search) ||
+                    (trip.description && trip.description.toLowerCase().includes(currentFilters.search))
+                );
+            }
+
+            // Country filter
+            if (currentFilters.country) {
+                filteredTrips = filteredTrips.filter(trip =>
+                    trip.location.toLowerCase().includes(currentFilters.country.toLowerCase())
+                );
+            }
+
+            // Year filter
+            if (currentFilters.year) {
+                filteredTrips = filteredTrips.filter(trip =>
+                    trip.date && trip.date.includes(currentFilters.year)
+                );
+            }
+
+            // Tag filter
+            if (currentFilters.tag) {
+                filteredTrips = filteredTrips.filter(trip =>
+                    trip.tags && trip.tags.includes(currentFilters.tag)
+                );
+            }
+
+            // Render filtered results
+            renderFilteredStories(filteredTrips);
+        }
+
+        // Render filtered stories
+        function renderFilteredStories(filteredTrips) {
+            const grid = document.getElementById('storiesGrid');
+
+            if (filteredTrips.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--soft-gray);">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
+                        <h3 style="margin-bottom: 10px; color: var(--dark-text);">No trips found</h3>
+                        <p>Try adjusting your search or filters</p>
+                        <button onclick="clearFilters()" style="margin-top: 20px; padding: 12px 24px; background: var(--forest-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Clear Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredTrips.map((trip) => `
+                <article class="story-card" onclick="openTripModal(${trip.id})">
+                    <div class="story-card-image">
+                        <img src="${optimizeImageUrl(trip.image, 600)}" alt="${trip.title}" loading="lazy">
+                        ${trip.is_public === false ? '<span class="privacy-badge">🔒 Private</span>' : ''}
+                    </div>
+                    <div class="story-card-content">
+                        <p class="story-card-location">${trip.location}</p>
+                        <h3>${trip.title}</h3>
+                        ${trip.tags && trip.tags.length > 0 ? `
+                            <div class="story-card-tags">
+                                ${trip.tags.slice(0, 3).map(tag => `<span class="story-tag">${getTagEmoji(tag)} ${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="story-card-meta">
+                            <span class="story-card-date">${trip.date}</span>
+                            <div class="story-card-stats">
+                                <span>&#9825; ${trip.likes}</span>
+                                <span>&#128172; ${trip.comments.length}</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            // Animate cards
+            setTimeout(() => {
+                document.querySelectorAll('.story-card').forEach((card, i) => {
+                    setTimeout(() => card.classList.add('visible'), i * 100);
+                });
+            }, 100);
+        }
+
+        // Get emoji for tag
+        function getTagEmoji(tag) {
+            const emojis = {
+                'beach': '🏖️',
+                'mountain': '⛰️',
+                'city': '🏙️',
+                'food': '🍜',
+                'adventure': '🎒',
+                'culture': '🏛️',
+                'nature': '🌿',
+                'romantic': '💕',
+                'road-trip': '🚗',
+                'hiking': '🥾',
+                'photography': '📸'
+            };
+            return emojis[tag] || '🏷️';
+        }
+
+        // Populate country filter from trips
+        function populateCountryFilter() {
+            const countries = new Set();
+            trips.forEach(trip => {
+                const parts = trip.location.split(',');
+                if (parts.length > 1) {
+                    countries.add(parts[parts.length - 1].trim());
+                } else {
+                    countries.add(parts[0].trim());
+                }
+            });
+
+            const select = document.getElementById('filterCountry');
+            select.innerHTML = '<option value="">All Countries</option>';
+            Array.from(countries).sort().forEach(country => {
+                select.innerHTML += `<option value="${country}">${country}</option>`;
+            });
+        }
+
+        // ======== ON THIS DAY MEMORIES ========
+        async function loadOnThisDay() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(API_BASE + '/trips/on-this-day', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!response.ok) return;
+
+                const memories = await response.json();
+                const section = document.getElementById('onThisDaySection');
+                const grid = document.getElementById('onThisDayGrid');
+
+                if (memories.length === 0) {
+                    section.style.display = 'none';
+                    return;
+                }
+
+                section.style.display = 'block';
+                grid.innerHTML = memories.map(memory => `
+                    <div class="memory-card" onclick="openTripModal(${memory.id})">
+                        <div class="memory-year">${memory.years_ago} year${memory.years_ago !== 1 ? 's' : ''} ago</div>
+                        <img src="${optimizeImageUrl(memory.image_url, 400)}" alt="${memory.title}" loading="lazy">
+                        <div class="memory-content">
+                            <h4>${memory.title}</h4>
+                            <p>${memory.location}</p>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load on-this-day memories:', error);
+            }
+        }
+
+        // ======== REACTIONS ========
+        async function addReaction(tripId, emoji) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showToast('Please log in to react');
+                    return;
+                }
+
+                const response = await fetch(API_BASE + `/trips/${tripId}/reaction`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ emoji })
+                });
+
+                if (response.ok) {
+                    showToast('Reaction added!');
+                    // Refresh trip to show updated reactions
+                    loadTripsFromAPI();
+                }
+            } catch (error) {
+                console.error('Failed to add reaction:', error);
+            }
+        }
+
+        async function removeReaction(tripId) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(API_BASE + `/trips/${tripId}/reaction`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (response.ok) {
+                    showToast('Reaction removed');
+                    loadTripsFromAPI();
+                }
+            } catch (error) {
+                console.error('Failed to remove reaction:', error);
+            }
+        }
+
+        // ======== YEARLY RECAP ========
+        async function loadYearlyRecap(year) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return null;
+
+                const response = await fetch(API_BASE + `/trips/yearly-recap/${year}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!response.ok) return null;
+                return await response.json();
+            } catch (error) {
+                console.error('Failed to load yearly recap:', error);
+                return null;
+            }
+        }
+
+        // ======== SERVICE WORKER REGISTRATION ========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
         }
 
         // Initialize
