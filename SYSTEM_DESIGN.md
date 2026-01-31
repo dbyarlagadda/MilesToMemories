@@ -60,17 +60,21 @@
 | Component | Technology | Purpose |
 |-----------|------------|---------|
 | Web App | HTML5, CSS3, Vanilla JS | Main user interface |
+| PWA | Service Worker, Manifest | Offline support, installable |
 | iOS Wrapper | Xcode/WKWebView | Native iOS app shell |
 | Map | Leaflet.js + CartoDB tiles | Interactive world map |
 | API Client | api.js | Centralized API communication |
 
 **Key Files:**
 - `index.html` - Main dashboard with map, stories, gallery
-- `login.html` - Authentication (login/register)
+- `login.html` - Authentication (login/register + OAuth)
 - `add-trip.html` - Trip creation form
 - `profile.html` - User profile management
 - `admin.html` - Admin dashboard
 - `api.js` - API client with auth handling
+- `sw.js` - Service worker for offline caching
+- `manifest.json` - PWA manifest
+- `offline.html` - Offline fallback page
 
 ### 3.2 Backend (API Layer)
 
@@ -87,10 +91,16 @@
 Authentication:
 POST   /api/auth/register     - Create new user
 POST   /api/auth/login        - User login
+POST   /api/auth/google       - Google OAuth sign-in
+POST   /api/auth/apple        - Apple OAuth sign-in
 GET    /api/auth/me           - Get current user
 
 Trips:
-GET    /api/trips             - List all trips
+GET    /api/trips             - List all trips (with search/filter)
+GET    /api/trips/featured    - Get featured (most liked) trips
+GET    /api/trips/on-this-day - Get memories from same date in past years
+GET    /api/trips/yearly-recap/:year - Get yearly travel statistics
+GET    /api/trips/tags        - Get all available tags
 GET    /api/trips/:id         - Get single trip
 POST   /api/trips             - Create trip (auth required)
 PUT    /api/trips/:id         - Update trip (owner only)
@@ -99,6 +109,8 @@ POST   /api/trips/:id/like    - Like a trip
 DELETE /api/trips/:id/like    - Unlike a trip
 POST   /api/trips/:id/save    - Save a trip
 DELETE /api/trips/:id/save    - Unsave a trip
+POST   /api/trips/:id/reaction - Add emoji reaction
+DELETE /api/trips/:id/reaction - Remove reaction
 
 Users:
 GET    /api/users/trips       - Get user's trips
@@ -113,7 +125,7 @@ DELETE /api/comments/:id      - Delete comment
 
 Admin:
 GET    /api/admin/stats       - Dashboard statistics
-GET    /api/admin/users       - List all users
+GET    /api/admin/users       - List all users (includes auth_provider)
 GET    /api/admin/trips       - List all trips
 DELETE /api/admin/users/:id   - Delete user
 DELETE /api/admin/trips/:id   - Delete trip
@@ -540,14 +552,127 @@ function setupLazyLoading() {
 
 ---
 
-## 9. Monitoring & Logging
+## 9. Progressive Web App (PWA)
 
-### 8.1 Current Setup
+### 9.1 Service Worker (`sw.js`)
+
+**Caching Strategies:**
+
+| Request Type | Strategy | Description |
+|--------------|----------|-------------|
+| App Shell | Cache First | HTML, CSS, JS cached on install |
+| API Requests | Network First | Try network, fallback to cache |
+| Images | Cache First + Revalidate | Serve cached, update in background |
+| Navigation | Network First + Offline | Show offline.html if both fail |
+
+**Precached Assets:**
+```javascript
+const PRECACHE_ASSETS = [
+    '/', '/index.html', '/login.html', '/add-trip.html',
+    '/profile.html', '/api.js', '/manifest.json', '/offline.html',
+    'https://fonts.googleapis.com/...',
+    'https://unpkg.com/leaflet@1.9.4/...'
+];
+```
+
+### 9.2 Web App Manifest
+
+```json
+{
+  "name": "MilesToMemories",
+  "short_name": "MilesToMemories",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#4a6741",
+  "orientation": "portrait-primary"
+}
+```
+
+### 9.3 Offline Features
+
+- **Offline Page:** Custom offline.html with cached content links
+- **Background Sync:** Queue trips created offline, sync when online
+- **Push Notifications:** Ready for implementation
+
+---
+
+## 10. UI/UX Design System
+
+### 10.1 Color Palette (3 Primary Colors)
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--primary` | #4a6741 | CTAs, accents, links |
+| `--background` | #faf8f5 | Page background |
+| `--text-primary` | #1a1a1a | Headings, primary text |
+| `--text-secondary` | #6b6b6b | Body text |
+| `--surface` | #ffffff | Cards, elevated surfaces |
+
+### 10.2 Typography Hierarchy
+
+| Element | Size | Font | Weight |
+|---------|------|------|--------|
+| H1 | 32-56px (clamp) | Cormorant Garamond | 500 |
+| H2 | 24-32px (clamp) | Cormorant Garamond | 500 |
+| H3 | 20-24px (clamp) | Cormorant Garamond | 500 |
+| H4 | 18px | Inter | 600 |
+| Body | 16px | Inter | 400 |
+| Small | 14px | Inter | 400 |
+| Caption | 12px | Inter (uppercase) | 500 |
+
+### 10.3 Spacing System (8px Grid)
+
+```css
+--space-1: 4px    --space-2: 8px     --space-3: 12px
+--space-4: 16px   --space-5: 24px    --space-6: 32px
+--space-8: 48px   --space-10: 64px   --space-12: 80px
+```
+
+### 10.4 Animations & Transitions
+
+| Animation | Duration | Easing | Usage |
+|-----------|----------|--------|-------|
+| Hover lift | 0.25s | ease-out | Cards rise 4px |
+| Image zoom | 0.6s | ease-out | 5% scale on hover |
+| Nav underline | 0.25s | ease-out | Link hover effect |
+| Button press | 0.15s | ease | 2% scale down |
+| Fade in | 0.4s | ease-out | Content appearance |
+| Slide up | 0.5s | ease-out | Cards entrance |
+
+**Easing Curves:**
+```css
+--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+### 10.5 Component Styling
+
+**Cards:**
+- Border radius: 12px
+- Shadow: 0 1px 2px rgba(0,0,0,0.04) → 0 8px 30px on hover
+- Padding: 24px internal
+
+**Buttons:**
+- Primary: Forest green background, white text
+- Border radius: 8px (square) or 9999px (pill)
+- Active state: scale(0.98)
+
+**Sections:**
+- Vertical padding: 80px
+- Header margin-bottom: 64px
+- Max content width: 1200px
+
+---
+
+## 11. Monitoring & Logging
+
+### 11.1 Current Setup
 
 - PM2 logs: `pm2 logs milestomemories`
 - Console logging for errors
 
-### 8.2 Recommended Additions
+### 11.2 Recommended Additions
 
 - [ ] CloudWatch metrics
 - [ ] Application logging (Winston)
@@ -556,9 +681,9 @@ function setupLazyLoading() {
 
 ---
 
-## 10. Deployment
+## 12. Deployment
 
-### 10.1 Current Deployment Process
+### 12.1 Current Deployment Process
 
 ```bash
 # 1. Push to GitHub
@@ -573,7 +698,7 @@ git pull origin main
 pm2 restart milestomemories --update-env
 ```
 
-### 10.2 Recommended CI/CD Pipeline
+### 12.2 Recommended CI/CD Pipeline
 
 ```
 ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
@@ -584,7 +709,7 @@ pm2 restart milestomemories --update-env
 
 ---
 
-## 11. Cost Analysis (AWS Free Tier)
+## 13. Cost Analysis (AWS Free Tier)
 
 | Service | Free Tier Limit | Current Usage |
 |---------|-----------------|---------------|
@@ -597,35 +722,39 @@ pm2 restart milestomemories --update-env
 
 ---
 
-## 12. Tech Stack Summary
+## 14. Tech Stack Summary
 
 | Layer | Technology |
 |-------|------------|
 | Frontend | HTML5, CSS3, Vanilla JavaScript |
+| PWA | Service Worker, Web Manifest |
 | Maps | Leaflet.js, CartoDB Tiles |
 | Backend | Node.js, Express.js |
 | Database | PostgreSQL (Aurora) |
-| Auth | JWT, bcryptjs |
+| Auth | JWT, bcryptjs, Google/Apple OAuth |
 | Hosting | AWS EC2, RDS |
 | DNS | FreeDNS (mooo.com) |
+| SSL | Let's Encrypt (certbot) |
 | Process Manager | PM2 |
 | Version Control | Git, GitHub |
 | iOS | Xcode, WKWebView |
 
 ---
 
-## 13. Future Enhancements
+## 15. Future Enhancements
 
 1. **Image Storage:** Migrate to S3 for scalable image hosting
 2. **Search:** Add Elasticsearch for trip/location search
 3. **Notifications:** Push notifications for likes/comments
 4. **Social Features:** Follow users, activity feed
-5. **Offline Mode:** Service worker for offline access
+5. ~~**Offline Mode:** Service worker for offline access~~ ✅ Implemented
 6. **Analytics:** User behavior tracking
 7. **Multi-language:** i18n support
 8. **API Versioning:** /api/v1/, /api/v2/
+9. **Image Upload:** Direct S3 upload with presigned URLs
+10. **Trip Sharing:** Public share links with OG meta tags
 
 ---
 
-*Document Version: 1.3*
-*Last Updated: January 28, 2026*
+*Document Version: 1.4*
+*Last Updated: January 29, 2026*
